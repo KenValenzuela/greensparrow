@@ -53,7 +53,7 @@ export async function POST(req) {
         preferred_artist: artist_id,
         message,
         appointment_date,
-        images
+        images // array of storage paths
       }])
       .select('id')
       .single();
@@ -78,7 +78,22 @@ export async function POST(req) {
       if (linkErr) throw linkErr;
     }
 
-    // 5) Send notification email
+    // 5) Generate signed URLs for image paths
+    let imageLinksHtml = '';
+    for (const path of images) {
+      const { data, error } = await supabase
+        .storage
+        .from('booking-images')
+        .createSignedUrl(path, 60 * 60); // 1 hour
+
+      if (!error && data?.signedUrl) {
+        imageLinksHtml += `<a href="${data.signedUrl}">${path}</a><br/>`;
+      } else {
+        imageLinksHtml += `<em>Could not sign: ${path}</em><br/>`;
+      }
+    }
+
+    // 6) Send notification email
     await resend.emails.send({
       from: 'greensparrowtattooco@gmail.com',
       to: process.env.NOTIFY_EMAIL,
@@ -93,9 +108,7 @@ export async function POST(req) {
         <p><strong>Customer Type:</strong> ${customer_type}</p>
         <p><strong>Appointment:</strong> ${appointment_date}</p>
         <p><strong>Message:</strong><br/> ${message}</p>
-        ${images.length > 0
-          ? `<p><strong>Images:</strong><br/>${images.map(url => `<a href="${url}">${url}</a>`).join('<br/>')}</p>`
-          : ''}
+        ${images.length > 0 ? `<p><strong>Images:</strong><br/>${imageLinksHtml}</p>` : ''}
         <hr/>
         <p>View booking in Supabase dashboard.</p>
       `
