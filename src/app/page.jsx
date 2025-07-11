@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
-import { getCLS, getFID, getLCP } from 'web-vitals'
+// Swapped getCLS/getFID/getLCP for the correct exports onCLS/onFID/onLCP
+import { onCLS, onFID, onLCP } from 'web-vitals'
 import dynamic from 'next/dynamic'
 import AboutSection from '@/components/AboutSection'
 
@@ -21,15 +22,18 @@ function sendMetric({ name, value, id }) {
 
 export default function HomePage() {
   useEffect(() => {
-    getCLS(sendMetric)
-    getFID(sendMetric)
-    getLCP(sendMetric)
+    // Use the correct web-vitals callbacks
+    onCLS(sendMetric)  // previously getCLS()
+    onFID(sendMetric)  // previously getFID()
+    onLCP(sendMetric)  // previously getLCP()
   }, [])
 
   return (
     <main>
       <AboutSection />
+
       <TeamSection />
+
       <Testimonials />
     </main>
   )
