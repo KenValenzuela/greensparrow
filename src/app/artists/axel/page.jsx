@@ -75,10 +75,7 @@ export default function ArtistPage() {
                 style={styles.gridItem}
                 loading="lazy"
               />
-              {/* Overlay credit for every image */}
-              <span style={styles.creditOverlay}>
-                Photo © RINDSTUDIO — Instagram @rindstudio | TikTok @officialrindstudio
-              </span>
+
             </div>
           ))}
         </div>
