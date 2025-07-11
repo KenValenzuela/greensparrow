@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
-// Swapped getCLS/getFID/getLCP for the correct exports onCLS/onFID/onLCP
-import { onCLS, onFID, onLCP } from 'web-vitals'
+// FID has been replaced by INP in web-vitals; remove onFID and import onINP instead
+import { onCLS, onLCP, onINP } from 'web-vitals'
 import dynamic from 'next/dynamic'
 import AboutSection from '@/components/AboutSection'
 
@@ -12,7 +12,7 @@ const Testimonials = dynamic(() => import('@/components/Testimonials'), { ssr: f
 // Send each metric via navigator.sendBeacon to your analytics endpoint
 function sendMetric({ name, value, id }) {
   const body = JSON.stringify({
-    name,                // e.g. 'LCP', 'CLS', 'FID'
+    name,                // e.g. 'LCP', 'CLS', 'INP'
     value,               // numeric metric value
     id,                  // unique for this metric instance
     url: window.location.pathname
@@ -22,10 +22,9 @@ function sendMetric({ name, value, id }) {
 
 export default function HomePage() {
   useEffect(() => {
-    // Use the correct web-vitals callbacks
-    onCLS(sendMetric)  // previously getCLS()
-    onFID(sendMetric)  // previously getFID()
-    onLCP(sendMetric)  // previously getLCP()
+    onCLS(sendMetric)   // track Cumulative Layout Shift
+    onLCP(sendMetric)   // track Largest Contentful Paint
+    onINP(sendMetric)   // track Interaction to Next Paint (replaces FID)
   }, [])
 
   return (
