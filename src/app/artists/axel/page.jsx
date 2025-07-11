@@ -30,27 +30,31 @@ export default function ArtistPage() {
         {/* Header / Bio */}
         <div style={styles.profile}>
           <img
-            src={`/images/artists/${slug}/${portraitFilename}`}
-            alt={`${slug} portrait`}
-            style={styles.portrait}
+              src={`/images/artists/${slug}/${portraitFilename}`}
+              alt={`${slug} portrait`}
+              style={styles.portrait}
           />
-
+          <div style={styles.creditInline}>
+            Photo © RINDSTUDIO — Instagram @rindstudio | TikTok @officialrindstudio
+          </div>
           <h1 style={styles.name}>Axel</h1>
           <p style={styles.title}>Piercing Specialist</p>
           <div style={styles.tags}>
             {['Piercing', 'Ear Curations', 'Implant-Grade Jewelry'].map((tag) => (
-              <span key={tag} style={styles.tag}>{tag}</span>
+                <span key={tag} style={styles.tag}>{tag}</span>
             ))}
           </div>
           <p style={styles.bio}>
-            Axel is the in-house piercer at Green Sparrow Tattoo Co., with over two years of experience. He's passionate about every aspect of the craft—from quality implant-grade jewelry to helping clients plan beautiful,
-            long-term ear curation projects. Axel focuses on creating a safe, clean, and empowering experience for each client, always prioritizing education, comfort, and aesthetic vision.
+            Axel is the in-house piercer at Green Sparrow Tattoo Co., with over two years of experience. He's passionate
+            about every aspect of the craft—from quality implant-grade jewelry to helping clients plan beautiful,
+            long-term ear curation projects. Axel focuses on creating a safe, clean, and empowering experience for each
+            client, always prioritizing education, comfort, and aesthetic vision.
           </p>
           <Link
-            href="https://www.instagram.com/piercingsbyaxel/"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={styles.cta}
+              href="https://www.instagram.com/piercingsbyaxel/"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={styles.cta}
           >
             View More on Instagram
           </Link>
@@ -59,8 +63,8 @@ export default function ArtistPage() {
         {/* Grid */}
         <div style={styles.grid}>
           {workImages.map((file, idx) => (
-            <div
-              key={idx}
+              <div
+                  key={idx}
               style={styles.gridItemWrapper}
               data-aos="fade-up"
               data-aos-delay={idx * 50}
