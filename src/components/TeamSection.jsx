@@ -19,10 +19,10 @@ const artists = [
     portfolio: '/artists/joe',
   },
   {
-    name: 'Mickey',
+    name: 'Micky',
     role: 'Cyber Sigilism',
     image: '/images/artists/mickey/mickey_portrait.PNG',
-    bio: 'Mickey brings a futuristic flair to her cyber sigilism tattoos, combining symbols with modern style.',
+    bio: 'Micky brings a futuristic flair to her cyber sigilism tattoos, combining symbols with modern style.',
     portfolio: '/artists/mickey',
   },
   {
