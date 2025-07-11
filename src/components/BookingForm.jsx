@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabaseClient';
 import ImageUpload from './ImageUpload';
 import { toast } from 'react-hot-toast';
-
 import { AnimatePresence, motion } from 'framer-motion';
 
 const stepLabels = [
@@ -20,7 +19,7 @@ const stepLabels = [
 ];
 
 const artists = ['Joe', 'Mickey', 'T', 'Mia', 'Ki', 'Axel'];
-const styles = ['Black & Grey', 'Cyber Sigilism', 'Anime', 'Floral', 'Neo Traditional', 'Piercing'];
+const styles = ['Black & Grey', 'Cyber Sigilism', 'Anime', 'Flora & Fauna', 'Fineline','Neo Traditional', 'Portrait', 'Piercing'];
 const customerTypes = ['New', 'Returning'];
 
 export default function BookingForm() {
@@ -32,17 +31,14 @@ export default function BookingForm() {
     placement: '',
     artist: [],
     style: [],
-    customerType: [],
+    customerType: []
   });
-
   const [dateType, setDateType] = useState('single');
   const [dateStart, setDateStart] = useState('');
   const [dateEnd, setDateEnd] = useState('');
   const [images, setImages] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [step, setStep] = useState(0);
-
-
 
   useEffect(() => {
     window?.gtag?.('event', 'form_step_view', {
@@ -74,15 +70,12 @@ export default function BookingForm() {
       const file = img.file;
       const ext = file.name.split('.').pop();
       const path = `booking_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-
       const { error } = await supabase.storage.from('booking-images').upload(path, file, {
         cacheControl: '3600',
         upsert: false,
         contentType: file.type
       });
-
       if (error) throw new Error(error.message);
-
       const { data } = supabase.storage.from('booking-images').getPublicUrl(path);
       if (data?.publicUrl) urls.push(data.publicUrl);
     }
@@ -91,16 +84,13 @@ export default function BookingForm() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    const { name, email, message, placement } = form;
-
+    const { name, email, message } = form;
     if (!name || !email || !message || (dateType === 'single' && !dateStart) || (dateType === 'range' && (!dateStart || !dateEnd))) {
       toast.error('Please fill out all required fields.');
       return;
     }
-
     setSubmitting(true);
     let imageUrls = [];
-
     try {
       if (images.length > 0) {
         imageUrls = await uploadImages();
@@ -110,24 +100,20 @@ export default function BookingForm() {
       setSubmitting(false);
       return;
     }
-
     const payload = {
       name: form.name.trim(),
       email: form.email.trim().toLowerCase(),
       phone: form.phone?.trim(),
-      description: message.trim(),
-      placement: placement.trim(),
+      description: form.message.trim(),
+      placement: form.placement.trim(),
       reference_img: imageUrls[0] || '',
       preferred_at: new Date(dateStart).toISOString()
     };
-
     const res = await fetch('/api/book', {
       method: 'POST',
       body: JSON.stringify(payload)
     });
-
     const { success, error } = await res.json();
-
     if (success) {
       toast.success('Booking submitted!');
       setForm({
@@ -138,7 +124,7 @@ export default function BookingForm() {
         placement: '',
         artist: [],
         style: [],
-        customerType: [],
+        customerType: []
       });
       setDateStart('');
       setDateEnd('');
@@ -147,21 +133,28 @@ export default function BookingForm() {
     } else {
       toast.error('Submission failed: ' + error);
     }
-
     setSubmitting(false);
   };
 
   const next = () => setStep(s => Math.min(s + 1, steps.length - 1));
   const back = () => setStep(s => Math.max(s - 1, 0));
 
+  // Inline style generator for toggle buttons
+  const chipStyle = (selected) => ({
+    margin: '0.3em',
+    padding: '0.5em 1em',
+    border: '2px solid #488955',
+    borderRadius: '24px',
+    background: selected ? '#e7b462' : '#1c1f1a', // highlighted background when selected
+    color: selected ? '#FFF' : '#ffffff',
+    cursor: 'pointer'
+  });
+
   const steps = [
     <div key="info">
       <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Before You Book</h2>
       <p>Artists are appointment-only with occasional walk-ins.</p>
-      <p>
-        Contact your preferred artist directly, or continue with our booking system. We'll try our best to be in contact within 24-48 hours.
-
-      </p>
+      <p>Contact your preferred artist directly, or continue with our booking system. We'll try our best to be in contact within 24-48 hours.</p>
       <button onClick={next}>Start Booking</button>
     </div>,
 
@@ -176,30 +169,54 @@ export default function BookingForm() {
 
     <div key="artist">
       <h3>Preferred Artist</h3>
-      {artists.map(a => (
-        <button key={a} type="button" onClick={() => toggle('artist', a)} style={{ margin: '0.3em' }}>
-          {a}
-        </button>
-      ))}
-      <button onClick={() => setForm(f => ({ ...f, artist: ['Assign for me'] }))}>Not sure? We’ll choose for you</button>
+      {artists.map(a => {
+        const isSelected = form.artist.includes(a);
+        return (
+          <button
+            key={a}
+            type="button"
+            onClick={() => toggle('artist', a)}
+            style={chipStyle(isSelected)}
+          >
+            {a}
+          </button>
+        );
+      })}
+
     </div>,
 
     <div key="style">
       <h3>Style</h3>
-      {styles.map(s => (
-        <button key={s} type="button" onClick={() => toggle('style', s)} style={{ margin: '0.3em' }}>
-          {s}
-        </button>
-      ))}
+      {styles.map(s => {
+        const isSelected = form.style.includes(s);
+        return (
+          <button
+            key={s}
+            type="button"
+            onClick={() => toggle('style', s)}
+            style={chipStyle(isSelected)}
+          >
+            {s}
+          </button>
+        );
+      })}
     </div>,
 
     <div key="type">
       <h3>Have you visited us before?</h3>
-      {customerTypes.map(ct => (
-        <button key={ct} type="button" onClick={() => toggle('customerType', ct)} style={{ margin: '0.3em' }}>
-          {ct}
-        </button>
-      ))}
+      {customerTypes.map(ct => {
+        const isSelected = form.customerType.includes(ct);
+        return (
+          <button
+            key={ct}
+            type="button"
+            onClick={() => toggle('customerType', ct)}
+            style={chipStyle(isSelected)}
+          >
+            {ct}
+          </button>
+        );
+      })}
     </div>,
 
     <div key="preferred-date">
@@ -213,7 +230,6 @@ export default function BookingForm() {
           <input type="radio" checked={dateType === 'range'} onChange={() => setDateType('range')} /> Date Range
         </label>
       </div>
-
       <div>
         <label>{dateType === 'range' ? 'Start Date' : 'Date'}*</label>
         <input
@@ -222,7 +238,6 @@ export default function BookingForm() {
           onChange={e => setDateStart(e.target.value)}
           style={{ width: '100%', padding: '0.5rem', marginBottom: '0.75rem' }}
         />
-
         {dateType === 'range' && (
           <>
             <label>End Date*</label>
@@ -235,7 +250,6 @@ export default function BookingForm() {
           </>
         )}
       </div>
-
       <p style={{ fontSize: '0.85rem', color: '#ccc', marginTop: '0.5rem' }}>
         {dateType === 'single'
           ? 'We’ll try to honor this date directly.'
@@ -269,7 +283,7 @@ export default function BookingForm() {
 
   return (
     <form onSubmit={handleSubmit} style={{ maxWidth: 600, margin: '0 auto', padding: '1.5rem 1rem' }}>
-      <div style={{ marginBottom: '1rem', height: '8px', background: '#488955', borderRadius: '4px' }}>
+      <div style={{ marginBottom: '1rem', height: '8px', background: '#3a2323', borderRadius: '4px' }}>
         <div
           style={{
             height: '100%',
