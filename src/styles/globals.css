@@ -89,11 +89,7 @@ html {
 
 
 
-img, video {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
+
 @media (min-width: 768px) {
   /* Applies to any portrait image in artist pages */
   [src*="/images/artists/"] {
