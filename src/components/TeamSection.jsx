@@ -43,7 +43,7 @@ const artists = [
     name: 'Ki',
     role: 'Neo Traditional / Floral / Color',
     image: '/images/artists/ki/ki_portrait.jpg',
-    bio: 'Ki does it all – from vibrant florals to detailed neotraditional color pieces.',
+    bio: 'Ki does it all – from vibrant florals to detailed neo-traditional color pieces.',
     portfolio: '/artists/ki',
   },
   {
@@ -57,7 +57,7 @@ const artists = [
     name: 'Dallon Oracle',
     role: 'Apprentice',
     image: '/images/artists/dallon/dallon_portrait.jpg',
-    bio: 'Dallon Oracle is a new apprentice passionate about learning fine line and blackwork.',
+    bio: 'Dallon Oracle is a new apprentice passionate about learning japanese and neo-traditional styles.',
     portfolio: '/artists/dallon',
   },
 ];
