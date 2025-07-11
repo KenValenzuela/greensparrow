@@ -47,7 +47,7 @@ export default function Navbar({ show = true }) {
     <>
       <header className="navbar">
         <div className="container">
-          {/* Left nav */}
+          {/* Left nav (hidden on mobile) */}
           <nav className="desktop-nav left">
             {navItems.slice(0, 2).map(([href, label]) => (
               <Link key={href} href={href}>
@@ -83,7 +83,7 @@ export default function Navbar({ show = true }) {
             </Link>
           </div>
 
-          {/* Right nav */}
+          {/* Right nav (hidden on mobile) */}
           <nav className="desktop-nav right">
             {navItems.slice(2).map(([href, label]) => (
               <Link key={href} href={href}>
@@ -92,9 +92,9 @@ export default function Navbar({ show = true }) {
             ))}
           </nav>
 
-          {/* Mobile icons */}
+          {/* Mobile icons: only show hamburger on mobile; phone hidden via .phone-icon */}
           <div className="mobile-icons">
-            <a href="tel:+16022093099" aria-label="Call us" style={{ padding: 8 }}>
+            <a href="tel:+16022093099" aria-label="Call us" className="phone-icon" style={{ padding: 8 }}>
               <FiPhone size={24} color="#F1EDE0" />
             </a>
             <button
@@ -110,7 +110,7 @@ export default function Navbar({ show = true }) {
           </div>
         </div>
 
-        {/* Mobile menu */}
+        {/* Mobile menu: still lists all nav items when open */}
         <div className={`hamburger-menu ${open ? 'show' : ''}`}>
           {navItems.map(([href, label]) => (
             <Link key={href} href={href} onClick={() => setOpen(false)}>
@@ -157,10 +157,6 @@ export default function Navbar({ show = true }) {
           flex-direction: column;
           align-items: center;
           text-align: center;
-        }
-
-        .logo-img {
-          /* no changes */
         }
 
         .hover-underline::after {
@@ -230,7 +226,12 @@ export default function Navbar({ show = true }) {
         }
 
         @media (max-width: 767px) {
-          /* span full width and adjust padding */
+          /* Hide desktop nav links */
+          .desktop-nav {
+            display: none;
+          }
+
+          /* Adjust container to flex */
           .container {
             display: flex;
             justify-content: space-between;
@@ -238,14 +239,18 @@ export default function Navbar({ show = true }) {
             padding: 0 1rem;
           }
 
-          /* only hide the logo image */
+          /* Hide logo image but show Home text */
           .logo-img {
             display: none;
           }
 
-          /* show mobile icons */
+          /* Show only hamburger (phone hidden via phone-icon rule) */
           .mobile-icons {
             display: flex;
+          }
+
+          .mobile-icons .phone-icon {
+            display: none;
           }
         }
 
