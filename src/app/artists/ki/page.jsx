@@ -29,24 +29,30 @@ export default function ArtistPage() {
         {/* Header / Bio */}
         <div style={styles.profile}>
           <img
-            src={`/images/artists/${slug}/${portraitFilename}`}
-            alt={`${slug}-portrait`}
-            style={styles.portrait}
+              src={`/images/artists/${slug}/${portraitFilename}`}
+              alt={`${slug}-portrait`}
+              style={styles.portrait}
           />
+          <div style={styles.creditInline}>
+            Photo © RINDSTUDIO — Instagram @rindstudio | TikTok @officialrindstudio
+          </div>
           <h1 style={styles.name}>Ki</h1>
           <p style={styles.title}>Tattoo Artist & Studio Owner</p>
           <div style={styles.tags}>
             {['Neo-Trad', 'Flora & Fauna', 'Freehand'].map((tag) => (
-              <span key={tag} style={styles.tag}>{tag}</span>
+                <span key={tag} style={styles.tag}>{tag}</span>
             ))}
           </div>
           <p style={styles.bio}>
-Ki is a versatile artist whose work is heavily influenced by flora, fauna, and natural elements. Known for bold lines, vibrant color, and freehand design, their tattooing spans neotraditional, illustrative, and traditional styles. Outside the studio, Ki enjoys gardening, homesteading, fishing, and spending time outdoors—interests that often inspire their creative direction          </p>
+            Ki is a versatile artist whose work is heavily influenced by flora, fauna, and natural elements. Known for
+            bold lines, vibrant color, and freehand design, their tattooing spans neotraditional, illustrative, and
+            traditional styles. Outside the studio, Ki enjoys gardening, homesteading, fishing, and spending time
+            outdoors—interests that often inspire their creative direction </p>
           <Link
-            href="https://www.instagram.com/parksart._?hl=en"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={styles.cta}
+              href="https://www.instagram.com/parksart._?hl=en"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={styles.cta}
           >
             View More on Instagram
           </Link>
@@ -55,8 +61,8 @@ Ki is a versatile artist whose work is heavily influenced by flora, fauna, and n
         {/* Portfolio Grid */}
         <div style={styles.grid}>
           {workImages.map((file, idx) => (
-            <img
-              key={idx}
+              <img
+                  key={idx}
               src={`/images/artists/${slug}/work/${file}`}
               alt={`Work ${idx + 1}`}
               style={styles.gridItem}

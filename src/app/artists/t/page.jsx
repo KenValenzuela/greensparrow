@@ -29,25 +29,33 @@ export default function ArtistPage() {
         {/* Header / Bio */}
         <div style={styles.profile}>
           <img
-            src={`/images/artists/${slug}/${portraitFilename}`}
-            alt={`${slug}-portrait`}
-            style={styles.portrait}
+              src={`/images/artists/${slug}/${portraitFilename}`}
+              alt={`${slug}-portrait`}
+              style={styles.portrait}
           />
+
+          <div style={styles.creditInline}>
+            Photo © RINDSTUDIO — Instagram @rindstudio | TikTok @officialrindstudio
+          </div>
+
           <h1 style={styles.name}>T-Money</h1>
           <p style={styles.title}>Tattoo Artist</p>
           <div style={styles.tags}>
             {['Anime', 'Fine Line', 'Character Work'].map((tag) => (
-              <span key={tag} style={styles.tag}>{tag}</span>
+                <span key={tag} style={styles.tag}>{tag}</span>
             ))}
           </div>
           <p style={styles.bio}>
-            T-Money is a Phoenix-born tattoo artist with a background in academic fine art and a love for anime-inspired design. They hold an Associate’s in Art and a Bachelor’s in Studio Art, which inform their precise, clean linework and thoughtful compositions. T specializes in anime tattoos, fine line work, and portrait-based designs—bringing personality, detail, and storytelling into every piece.
+            T-Money is a Phoenix-born tattoo artist with a background in academic fine art and a love for anime-inspired
+            design. They hold an Associate’s in Art and a Bachelor’s in Studio Art, which inform their precise, clean
+            linework and thoughtful compositions. T specializes in anime tattoos, fine line work, and portrait-based
+            designs—bringing personality, detail, and storytelling into every piece.
           </p>
           <Link
-            href="https://www.instagram.com/_.t._money/?hl=en"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={styles.cta}
+              href="https://www.instagram.com/_.t._money/?hl=en"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={styles.cta}
           >
             View More on Instagram
           </Link>
@@ -56,8 +64,8 @@ export default function ArtistPage() {
         {/* Portfolio Grid */}
         <div style={styles.grid}>
           {workImages.map((file, idx) => (
-            <img
-              key={idx}
+              <img
+                  key={idx}
               src={`/images/artists/${slug}/work/${file}`}
               alt={`Work ${idx + 1}`}
               style={styles.gridItem}

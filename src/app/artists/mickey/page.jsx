@@ -25,24 +25,33 @@ export default function ArtistPage() {
         {/* Header / Bio */}
         <div style={styles.profile}>
           <img
-            src={`/images/artists/${slug}/${portraitFilename}`}
-            alt={`${slug} portrait`}
-            style={styles.portrait}
+              src={`/images/artists/${slug}/${portraitFilename}`}
+              alt={`${slug} portrait`}
+              style={styles.portrait}
           />
+
+          <div style={styles.creditInline}>
+            Photo © RINDSTUDIO — Instagram @rindstudio | TikTok @officialrindstudio
+          </div>
+
           <h1 style={styles.name}>Micky</h1>
           <p style={styles.title}>Tattoo Artist</p>
           <div style={styles.tags}>
             {['Cyber-Sigilism', 'Freehand', 'Spooky'].map((tag) => (
-              <span key={tag} style={styles.tag}>{tag}</span>
+                <span key={tag} style={styles.tag}>{tag}</span>
             ))}
           </div>
           <p style={styles.bio}>
-Micky has been tattooing professionally for over five years, turning a lifelong dream into a full-time career. Their work blends cybercore, sci-fi, and fictional characters—often drawn freehand directly on the body to create a personal, collaborative experience. Micky’s style is bold, imaginative, and deeply rooted in their passion for people and art. Outside the studio, they enjoy spending time with their pets and consider Green Sparrow Tattoo Co. a true creative home.          </p>
+            Micky has been tattooing professionally for over five years, turning a lifelong dream into a full-time
+            career. Their work blends cybercore, sci-fi, and fictional characters—often drawn freehand directly on the
+            body to create a personal, collaborative experience. Micky’s style is bold, imaginative, and deeply rooted
+            in their passion for people and art. Outside the studio, they enjoy spending time with their pets and
+            consider Green Sparrow Tattoo Co. a true creative home. </p>
           <Link
-            href="https://www.instagram.com/cyber_dreamcore/?hl=en/"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={styles.cta}
+              href="https://www.instagram.com/cyber_dreamcore/?hl=en/"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={styles.cta}
           >
             View More on Instagram
           </Link>
@@ -51,8 +60,8 @@ Micky has been tattooing professionally for over five years, turning a lifelong 
         {/* Grid */}
         <div style={styles.grid}>
           {workImages.map((file, idx) => (
-            <img
-              key={idx}
+              <img
+                  key={idx}
               src={`/images/artists/${slug}/work/${file}`}
               alt={`Work ${idx + 1}`}
               style={styles.gridItem}

@@ -49,7 +49,7 @@ const artists = [
   {
     name: 'Axel',
     role: 'Piercer',
-    image: '/images/artists/axel/axel_portrait.jpeg',
+    image: '/images/artists/axel/axel_portrait.jpg',
     bio: 'Axel is our studio piercer, known for a gentle approach and precise placement.',
     portfolio: '/artists/axel',
   },

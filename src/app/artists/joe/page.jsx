@@ -25,25 +25,30 @@ export default function ArtistPage() {
         {/* Header / Bio */}
         <div style={styles.profile}>
           <img
-            src={`/images/artists/${slug}/${portraitFilename}`}
-            alt={`${slug}-portrait`}
-            style={styles.portrait}
+              src={`/images/artists/${slug}/${portraitFilename}`}
+              alt={`${slug}-portrait`}
+              style={styles.portrait}
           />
+          <div style={styles.creditInline}>
+            Photo © RINDSTUDIO — Instagram @rindstudio | TikTok @officialrindstudio
+          </div>
           <h1 style={styles.name}>Joe</h1>
           <p style={styles.title}>Tattoo Artist</p>
           <div style={styles.tags}>
-            {['Black & Grey', 'Realism',  'Portraits', ].map((tag) => (
-              <span key={tag} style={styles.tag}>{tag}</span>
+            {['Black & Grey', 'Realism', 'Portraits',].map((tag) => (
+                <span key={tag} style={styles.tag}>{tag}</span>
             ))}
           </div>
           <p style={styles.bio}>
-            Joe is a Mesa-based tattoo artist focusing primarily on black and gray realism. He aims to create a comfortable, easygoing environment where clients feel welcome, respected, and excited to return. Joe’s style combines precision with a laid-back vibe that helps clients feel at ease throughout the process.
+            Joe is a Mesa-based tattoo artist focusing primarily on black and gray realism. He aims to create a
+            comfortable, easygoing environment where clients feel welcome, respected, and excited to return. Joe’s style
+            combines precision with a laid-back vibe that helps clients feel at ease throughout the process.
           </p>
           <Link
-            href="https://www.instagram.com/joseffdubbe_tattoo/?hl=en"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={styles.cta}
+              href="https://www.instagram.com/joseffdubbe_tattoo/?hl=en"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={styles.cta}
           >
             View More on Instagram
           </Link>
@@ -52,8 +57,8 @@ export default function ArtistPage() {
         {/* Grid */}
         <div style={styles.grid}>
           {workImages.map((file, idx) => (
-            <img
-              key={idx}
+              <img
+                  key={idx}
               src={`/images/artists/${slug}/work/${file}`}
               alt={`Work ${idx + 1}`}
               style={styles.gridItem}

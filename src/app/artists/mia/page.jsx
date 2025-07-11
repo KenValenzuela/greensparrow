@@ -25,24 +25,30 @@ export default function ArtistPage() {
         {/* Header / Bio */}
         <div style={styles.profile}>
           <img
-            src={`/images/artists/${slug}/${portraitFilename}`}
-            alt={`${slug}-portrait`}
-            style={styles.portrait}
+              src={`/images/artists/${slug}/${portraitFilename}`}
+              alt={`${slug}-portrait`}
+              style={styles.portrait}
           />
+          <div style={styles.creditInline}>
+            Photo © RINDSTUDIO — Instagram @rindstudio | TikTok @officialrindstudio
+          </div>
           <h1 style={styles.name}>Mia</h1>
           <p style={styles.title}>Tattoo Artist</p>
           <div style={styles.tags}>
-            {['Black & Grey', 'Illustrative',  'Fine Line', ].map((tag) => (
-              <span key={tag} style={styles.tag}>{tag}</span>
+            {['Black & Grey', 'Illustrative', 'Fine Line',].map((tag) => (
+                <span key={tag} style={styles.tag}>{tag}</span>
             ))}
           </div>
           <p style={styles.bio}>
-Mia is a Phoenix-based tattoo artist specializing in black and gray work. With a strong foundation in ballpoint pen illustration, she earned a Bachelor’s in Drawing & Painting in 2022 before transitioning into tattooing. Mia’s approach is detail-oriented and expressive, bringing subtle texture and emotion to every piece.          </p>
+            Mia is a Phoenix-based tattoo artist specializing in black and gray work. With a strong foundation in
+            ballpoint pen illustration, she earned a Bachelor’s in Drawing & Painting in 2022 before transitioning into
+            tattooing. Mia’s approach is detail-oriented and expressive, bringing subtle texture and emotion to every
+            piece. </p>
           <Link
-            href="https://www.instagram.com/miachristattoo/?hl=en"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={styles.cta}
+              href="https://www.instagram.com/miachristattoo/?hl=en"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={styles.cta}
           >
             View More on Instagram
           </Link>
@@ -51,8 +57,8 @@ Mia is a Phoenix-based tattoo artist specializing in black and gray work. With a
         {/* Grid */}
         <div style={styles.grid}>
           {workImages.map((file, idx) => (
-            <img
-              key={idx}
+              <img
+                  key={idx}
               src={`/images/artists/${slug}/work/${file}`}
               alt={`Work ${idx + 1}`}
               style={styles.gridItem}
