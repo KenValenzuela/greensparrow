@@ -2,44 +2,97 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { artists } from '../lib/artists';
+import { artists } from '@/lib/artists';
 
-export default function ArtistNav() {
-  // get last segment as slug
-  const path = usePathname();                       // e.g. "/artists/joe"
-  const slug = path.split('/').filter(Boolean).pop();
+export default function ArtistsLayout({ children }) {
+  const path = usePathname() || '';
+  const segments = path.split('/').filter(Boolean);
+  const slug = segments[1];
 
-  const idx  = artists.findIndex((a) => a.slug === slug);
-  if (idx === -1) return null;                      // not on an artist page
+  const idx = artists.findIndex((a) => a.slug === slug);
+  const showNav = idx >= 0;
 
-  const prev = artists[(idx - 1 + artists.length) % artists.length];
-  const next = artists[(idx + 1) % artists.length];
+  const prev = showNav
+    ? artists[(idx - 1 + artists.length) % artists.length]
+    : null;
+  const next = showNav
+    ? artists[(idx + 1) % artists.length]
+    : null;
 
   return (
-    <nav className="artist-nav">
-      <Link href={`/artists/${prev.slug}`} className="nav-link">
-        ← {prev.name}
-      </Link>
-      <Link href="/artists" className="nav-link">
-        Back to Team
-      </Link>
-      <Link href={`/artists/${next.slug}`} className="nav-link">
-        {next.name} →
-      </Link>
+    <div className="layout">
+      <main className="content">
+        {children}
+      </main>
+
+      {showNav && (
+        <aside className="artist-nav">
+          <Link href={`/artists/${prev.slug}`} className="nav-link">
+            <span className="arrow">←</span> {prev.name}
+          </Link>
+
+          <Link href="/artists" className="nav-link center-link">
+            Back to Team
+          </Link>
+
+          <Link href={`/artists/${next.slug}`} className="nav-link">
+            {next.name} <span className="arrow">→</span>
+          </Link>
+        </aside>
+      )}
 
       <style jsx>{`
-        .artist-nav {
+        .layout {
           display: flex;
-          justify-content: space-between;
-          margin: 3rem 0 1rem;
+          flex-direction: column;
         }
+
+        /* Desktop: nav on left, content on right */
+        @media (min-width: 768px) {
+          .layout {
+            flex-direction: row;
+          }
+          .artist-nav {
+            display: flex;
+            flex: 0 0 200px;
+            margin-right: 24px;
+            flex-direction: column;
+            gap: 16px;
+          }
+          .content {
+            flex: 1;
+          }
+        }
+
+        /* Mobile: nav below content, horizontal */
+        @media (max-width: 767px) {
+          .artist-nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            margin-top: 16px;  /* push nav below content */
+          }
+        }
+
+        
+
         .nav-link {
           color: #E5948B;
           font-weight: 600;
           text-decoration: none;
           font-size: 1rem;
+          display: flex;
+          align-items: center;
+        }
+
+        .arrow {
+          font-size: 1.25rem;
+        }
+
+        .center-link {
+          justify-content: center;
         }
       `}</style>
-    </nav>
+    </div>
   );
 }

@@ -37,7 +37,7 @@ export default function ArtistPage() {
             ))}
           </div>
           <p style={styles.bio}>
-Micky has been tattooing professionally for over five years, turning a lifelong dream into a full-time career. Their work blends cybercore, sci-fi, and fictional characters—often drawn freehand directly on the body to create a personal, collaborative experience. Mickey’s style is bold, imaginative, and deeply rooted in their passion for people and art. Outside the studio, they enjoy spending time with their pets and consider Green Sparrow Tattoo Co. a true creative home.          </p>
+Micky has been tattooing professionally for over five years, turning a lifelong dream into a full-time career. Their work blends cybercore, sci-fi, and fictional characters—often drawn freehand directly on the body to create a personal, collaborative experience. Micky’s style is bold, imaginative, and deeply rooted in their passion for people and art. Outside the studio, they enjoy spending time with their pets and consider Green Sparrow Tattoo Co. a true creative home.          </p>
           <Link
             href="https://www.instagram.com/cyber_dreamcore/?hl=en/"
             target="_blank"
