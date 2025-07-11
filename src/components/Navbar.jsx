@@ -56,12 +56,13 @@ export default function Navbar({ show = true }) {
             ))}
           </nav>
 
-          {/* Logo */}
+          {/* Logo + Home block */}
           <div className="logo-block">
             <Link href="/" style={{ zIndex: 2 }}>
               <img
                 src="/images/green-sparrow-transparent.png"
                 alt="Green Sparrow Tattoo Co."
+                className="logo-img"
                 style={{
                   objectFit: 'contain',
                   height: scrolled ? '80px' : '100px',
@@ -109,7 +110,7 @@ export default function Navbar({ show = true }) {
           </div>
         </div>
 
-        {/* Mobile menu (inside navbar for proper flow) */}
+        {/* Mobile menu */}
         <div className={`hamburger-menu ${open ? 'show' : ''}`}>
           {navItems.map(([href, label]) => (
             <Link key={href} href={href} onClick={() => setOpen(false)}>
@@ -125,7 +126,9 @@ export default function Navbar({ show = true }) {
           top: 0;
           z-index: 999;
           width: 100%;
-          background-image: linear-gradient(rgba(44, 32, 22, 0.85), rgba(44, 32, 22, 0.85)), url('/images/background.png');
+          background-image:
+            linear-gradient(rgba(44, 32, 22, 0.85), rgba(44, 32, 22, 0.85)),
+            url('/images/background.png');
           background-size: cover;
           background-repeat: repeat-x;
           border-top: 2px solid #687357;
@@ -134,12 +137,12 @@ export default function Navbar({ show = true }) {
         }
 
         .container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 0 1.5rem;
           display: grid;
           grid-template-columns: 1fr auto 1fr;
           align-items: center;
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 1.5rem;
         }
 
         .desktop-nav {
@@ -154,6 +157,10 @@ export default function Navbar({ show = true }) {
           flex-direction: column;
           align-items: center;
           text-align: center;
+        }
+
+        .logo-img {
+          /* no changes */
         }
 
         .hover-underline::after {
@@ -218,21 +225,32 @@ export default function Navbar({ show = true }) {
           text-transform: uppercase;
           padding: 0.5em 1em;
           text-decoration: none;
+          width: 100%;
+          text-align: center;
         }
 
         @media (max-width: 767px) {
-          .desktop-nav {
-            display: none !important;
+          /* span full width and adjust padding */
+          .container {
+            display: flex;
+            justify-content: space-between;
+            max-width: 100%;
+            padding: 0 1rem;
           }
 
+          /* only hide the logo image */
+          .logo-img {
+            display: none;
+          }
+
+          /* show mobile icons */
           .mobile-icons {
             display: flex;
-            justify-content: flex-end;
           }
         }
 
         @media (max-width: 480px) {
-          .logo-block img {
+          .logo-img {
             max-height: 60px;
           }
         }
