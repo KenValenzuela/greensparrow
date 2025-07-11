@@ -45,7 +45,7 @@ export default function ArtistPage() {
             ))}
           </div>
           <p style={styles.bio}>
-            Axel is the in-house piercer at Green Sparrow Tattoo Co., with over two years of experience. He's passionate
+            Axel is the in-house award-winning piercer at Green Sparrow Tattoo Co., with over two years of experience. He's passionate
             about every aspect of the craft—from quality implant-grade jewelry to helping clients plan beautiful,
             long-term ear curation projects. Axel focuses on creating a safe, clean, and empowering experience for each
             client, always prioritizing education, comfort, and aesthetic vision.
