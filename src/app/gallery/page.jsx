@@ -8,7 +8,9 @@ const artistImageMap = {
   Mickey: ['mickey_1.jpeg', 'mickey_2.jpeg', 'mickey_3.jpeg', 'mickey_4.jpeg', 'mickey_6.jpeg', 'mickey_7.jpeg', 'mickey_8.jpeg', 'mickey_9.jpeg', 'mickey_10.jpeg', 'mickey_11.jpeg', 'mickey_12.jpeg', 'mickey_13.jpeg'],
   T: ['t_1.jpeg', 't_2.jpeg', 't_3.jpeg', 't_4.jpeg', 't_5.jpeg', 't_6.jpeg', 't_7.jpeg', 't_8.jpeg', 't_9.jpeg', 't_10.jpeg', 't_11.jpeg', 't_12.jpeg', 't_13.jpeg', 't_14.jpeg', 't_15.jpeg', 't_16.jpeg', 't_17.jpeg', 't_18.jpeg'],
   Ki: ['ki_1.jpeg', 'ki_2.jpeg', 'ki_3.jpeg', 'ki_4.jpeg', 'ki_5.jpeg', 'ki_6.jpeg', 'ki_7.jpeg', 'ki_8.jpeg', 'ki_9.jpeg', 'ki_10.jpeg', 'ki_11.jpeg', 'ki_12.jpeg', 'ki_13.jpeg', 'ki_14.jpeg', 'ki_15.jpeg', 'ki_16.jpeg', 'ki_17.jpeg'],
-  Axel: ['axel_1.jpeg', 'axel_2.jpeg', 'axel_3.jpeg', 'axel_4.jpeg', 'axel_5.jpeg', 'axel_6.jpeg', 'axel_7.jpeg', 'axel_9.jpeg', 'axel_10.jpeg', 'axel_11.jpeg', 'axel_15.jpeg']
+  Axel: ['axel_1.jpeg', 'axel_2.jpeg', 'axel_3.jpeg', 'axel_4.jpeg', 'axel_5.jpeg', 'axel_6.jpeg', 'axel_7.jpeg', 'axel_9.jpeg', 'axel_10.jpeg', 'axel_11.jpeg', 'axel_15.jpeg'],
+  Dallon:['dallon_1.jpeg','dallon_2.jpeg','dallon_3.jpeg','dallon_4.jpeg','dallon_5.jpeg','dallon_6.jpeg','dallon_7.jpeg'],
+  Mia:['mia_1.jpeg','mia_2.jpeg','mia_3.jpeg','mia_4.jpeg','mia_5.jpeg','mia_6.jpeg']
 };
 
 const artists = Object.keys(artistImageMap);

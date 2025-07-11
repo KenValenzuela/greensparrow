@@ -60,7 +60,7 @@ export default function AboutPage() {
                 Over the years, they developed across multiple mediums including acrylic, charcoal, and clay before discovering tattooing in 2019 through an unexpected apprenticeship opportunity.
               </p>
               <p>
-                After working between shops and independently building a client base, they returned to a traditional studio — Smoke N Ink — and later stepped out to establish something more personal. Green Sparrow was born from that vision: a space built with the help of family, community, and intention.
+                After working between shops and independently building a client base, they returned to a traditional studio and later stepped out to establish something more personal. Green Sparrow was born from that vision: a space built with the help of family, community, and intention.
               </p>
               <p>
                 Today, the shop stands as a reflection of that journey — rooted in grit, shaped by art, and open to all.
