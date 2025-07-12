@@ -31,7 +31,6 @@ export default function EventsPage() {
   }, []);
 
   const flyerImages = ['1.png', '2.png', '3.png', '4.png'];
-
   const artistLinks = [
     { name: 'Joe', url: 'https://www.instagram.com/joseffdubbe_tattoo/' },
     { name: 'Mickey', url: 'https://www.instagram.com/cyber_dreamcore/' },
@@ -43,21 +42,23 @@ export default function EventsPage() {
     { name: 'Zen by Zanaya', url: 'https://www.instagram.com/zenbyzanaya/' },
   ];
 
+  // match the same dimness as AboutSection: rgba alpha 0.92
+  const backgroundStyle = {
+    backgroundColor: '#1e1a17',
+    backgroundImage:
+      "linear-gradient(rgba(30,26,23,0.92), rgba(30,26,23,0.92)), url('/images/background.png')",
+    backgroundSize: 'cover',
+    backgroundPosition: 'center top',
+    backgroundRepeat: 'no-repeat',
+    backgroundAttachment: 'fixed',
+    padding: '64px 16px',
+    color: '#F1EDE0',
+    minHeight: '100vh',
+    boxSizing: 'border-box',
+  };
+
   return (
-    <main
-      style={{
-        backgroundImage: isMobile
-          ? 'none'
-          : `linear-gradient(rgba(30,26,23,0.92), rgba(30,26,23,0.92)), url('/images/background.png')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center top',
-        backgroundRepeat: 'no-repeat',
-        padding: '64px 16px',
-        color: '#F1EDE0',
-        minHeight: '100vh',
-        boxSizing: 'border-box',
-      }}
-    >
+    <main style={backgroundStyle}>
       <motion.h1
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -65,7 +66,7 @@ export default function EventsPage() {
         style={{
           textAlign: 'center',
           fontSize: '2.5rem',
-          fontFamily: 'Sancreek, serif',
+          fontFamily: 'Sancreek, cursive',
           color: '#E4938A',
           marginBottom: '2rem',
         }}
@@ -73,7 +74,14 @@ export default function EventsPage() {
         July Flash Event
       </motion.h1>
 
-      <section style={{ maxWidth: '980px', margin: '0 auto 48px', borderRadius: '8px', overflow: 'hidden' }}>
+      <section
+        style={{
+          maxWidth: '980px',
+          margin: '0 auto 48px',
+          borderRadius: '8px',
+          overflow: 'hidden',
+        }}
+      >
         <Swiper
           modules={[Navigation, Autoplay]}
           navigation
@@ -104,7 +112,16 @@ export default function EventsPage() {
       </section>
 
       <section style={{ marginBottom: '48px', textAlign: 'center' }}>
-        <h2 style={{ fontSize: '1.5rem', marginBottom: '16px' }}>Follow the Artists & Vendors</h2>
+        <h2
+          style={{
+            fontSize: '1.5rem',
+            marginBottom: '16px',
+            fontFamily: 'Lora, serif',
+            color: '#F1EDE0',
+          }}
+        >
+          Follow the Artists & Vendors
+        </h2>
         <ul
           style={{
             listStyle: 'none',
@@ -131,14 +148,6 @@ export default function EventsPage() {
         </ul>
       </section>
 
-      <section style={{ maxWidth: '640px', margin: '0 auto', textAlign: 'center' }}>
-
-
-
-
-      </section>
-
-      {/* Fullscreen modal for image preview */}
       <AnimatePresence>
         {modalImage && (
           <motion.div

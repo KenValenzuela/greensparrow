@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FiPhone } from 'react-icons/fi';
@@ -15,15 +15,17 @@ export default function Navbar({ show = true }) {
     ['/artists', 'Artists'],
     ['/gallery', 'Gallery'],
     ['/booking', 'Booking'],
-    ['/faq', 'FAQ']
+    ['/faq', 'FAQ'],
   ];
 
+  // add/remove scrolled state based on window scroll
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // close mobile menu when route changes
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
@@ -38,7 +40,7 @@ export default function Navbar({ show = true }) {
     textAlign: 'center',
     position: 'relative',
     transition: 'color 0.3s ease',
-    whiteSpace: 'nowrap'
+    whiteSpace: 'nowrap',
   });
 
   if (!show) return null;
@@ -47,16 +49,18 @@ export default function Navbar({ show = true }) {
     <>
       <header className="navbar">
         <div className="container">
-          {/* Left nav (hidden on mobile) */}
+          {/* Left side desktop links */}
           <nav className="desktop-nav left">
             {navItems.slice(0, 2).map(([href, label]) => (
               <Link key={href} href={href}>
-                <span style={linkStyle(href)} className="hover-underline">{label}</span>
+                <span style={linkStyle(href)} className="hover-underline">
+                  {label}
+                </span>
               </Link>
             ))}
           </nav>
 
-          {/* Logo + Home block */}
+          {/* Logo and Home */}
           <div className="logo-block">
             <Link href="/" style={{ zIndex: 2 }}>
               <img
@@ -67,34 +71,43 @@ export default function Navbar({ show = true }) {
                   objectFit: 'contain',
                   height: scrolled ? '80px' : '100px',
                   transition: 'all 0.3s ease',
-                  filter: 'drop-shadow(1px 1px 3px rgba(0,0,0,0.6))'
+                  filter: 'drop-shadow(1px 1px 3px rgba(0,0,0,0.6))',
                 }}
               />
             </Link>
             <Link href="/">
-              <span style={{
-                ...linkStyle('/'),
-                fontSize: '14px',
-                marginTop: '-0.5rem',
-                display: 'block'
-              }}>
+              <span
+                style={{
+                  ...linkStyle('/'),
+                  fontSize: '14px',
+                  marginTop: '-0.5rem',
+                  display: 'block',
+                }}
+              >
                 Home
               </span>
             </Link>
           </div>
 
-          {/* Right nav (hidden on mobile) */}
+          {/* Right side desktop links */}
           <nav className="desktop-nav right">
             {navItems.slice(2).map(([href, label]) => (
               <Link key={href} href={href}>
-                <span style={linkStyle(href)} className="hover-underline">{label}</span>
+                <span style={linkStyle(href)} className="hover-underline">
+                  {label}
+                </span>
               </Link>
             ))}
           </nav>
 
-          {/* Mobile icons: only show hamburger on mobile; phone hidden via .phone-icon */}
+          {/* Mobile icons: phone (hidden) + hamburger */}
           <div className="mobile-icons">
-            <a href="tel:+16022093099" aria-label="Call us" className="phone-icon" style={{ padding: 8 }}>
+            <a
+              href="tel:+16022093099"
+              aria-label="Call us"
+              className="phone-icon"
+              style={{ padding: 8 }}
+            >
               <FiPhone size={24} color="#F1EDE0" />
             </a>
             <button
@@ -110,7 +123,7 @@ export default function Navbar({ show = true }) {
           </div>
         </div>
 
-        {/* Mobile menu: still lists all nav items when open */}
+        {/* Mobile menu: absolute full-width dropdown */}
         <div className={`hamburger-menu ${open ? 'show' : ''}`}>
           {navItems.map(([href, label]) => (
             <Link key={href} href={href} onClick={() => setOpen(false)}>
@@ -126,8 +139,12 @@ export default function Navbar({ show = true }) {
           top: 0;
           z-index: 999;
           width: 100%;
-          background-image:
-            linear-gradient(rgba(44, 32, 22, 0.85), rgba(44, 32, 22, 0.85)),
+          /* allow absolute children to align to full width */
+          position: relative;
+          background-image: linear-gradient(
+              rgba(44, 32, 22, 0.85),
+              rgba(44, 32, 22, 0.85)
+            ),
             url('/images/background.png');
           background-size: cover;
           background-repeat: repeat-x;
@@ -198,15 +215,21 @@ export default function Navbar({ show = true }) {
         .bar {
           width: 24px;
           height: 3px;
-          background-color: #F1EDE0;
+          background-color: #f1ede0;
         }
 
+        /* full-width, absolute-positioned mobile menu */
         .hamburger-menu {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
           display: none;
           flex-direction: column;
           align-items: center;
-          background: #2C2016;
+          background: #2c2016;
           padding: 1em 0;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         .hamburger-menu.show {
@@ -214,37 +237,35 @@ export default function Navbar({ show = true }) {
         }
 
         .mobile-link {
-          color: #EDE7D9;
+          color: #ede7d9;
           font-size: 18px;
           font-family: 'Cormorant Garamond', serif;
           font-weight: 600;
           text-transform: uppercase;
-          padding: 0.5em 1em;
+          padding: 0.75em 1.5em;
           text-decoration: none;
           width: 100%;
+          max-width: 400px; /* prevent over-stretch on larger phones */
           text-align: center;
+          box-sizing: border-box;
         }
 
         @media (max-width: 767px) {
-          /* Hide desktop nav links */
           .desktop-nav {
             display: none;
           }
 
-          /* Adjust container to flex */
           .container {
             display: flex;
             justify-content: space-between;
             max-width: 100%;
-            padding: 0 1rem;
+            padding: 0 0.005rem; /* reduced padding so menu aligns flush */
           }
 
-          /* Hide logo image but show Home text */
           .logo-img {
             display: none;
           }
 
-          /* Show only hamburger (phone hidden via phone-icon rule) */
           .mobile-icons {
             display: flex;
           }

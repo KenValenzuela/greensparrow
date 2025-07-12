@@ -1,266 +1,221 @@
 'use client';
+
 import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <div style={{ position: 'relative', overflow: 'hidden', width: '100%' }}>
-      <footer
-        className="footer"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(44,32,22,0.85), rgba(44,32,22,0.85)), url('/images/background.png')",
-          backgroundColor: '#2C2016',
-          backgroundSize: 'cover',
-          backgroundRepeat: 'repeat-x',
-          backgroundPosition: 'center top',
-          borderTop: '2px solid #687357',
-          color: '#FFFFFF',
-          display: 'grid',
-          gridTemplateAreas: `
-            "nav     cta      socials"
-            "nav     logo     socials"
-            "nav     address  socials"
-          `,
-          gridTemplateColumns: '1fr auto 1fr',
-          padding: '2.25rem 1.25rem',
-          gap: '1.5rem 1rem',
-          boxSizing: 'border-box',
-          width: '100%',
-          maxWidth: '100vw',
-        }}
-      >
-        {/* NAVIGATION */}
-        <nav
-          className="footer-nav"
-          style={{
-            gridArea: 'nav',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            fontFamily: 'Lora, serif',
-            textTransform: 'uppercase',
-            letterSpacing: '1.6px',
-            fontSize: 'clamp(14px, 1.2vw, 16px)',
-            gap: '0.6rem',
-          }}
-          aria-label="Footer navigation"
-        >
+    <footer className="footer" aria-labelledby="footer-heading">
+      <h2 id="footer-heading" className="sr-only">Footer</h2>
+      <div className="footer-container">
+        {/* LEFT COLUMN: Navigation */}
+        <nav className="footer-nav" aria-label="Footer navigation">
           {[
             ['/gallery', 'Our Work'],
-            ['/about', 'About Us'],
-            ['/booking', 'Book Now'],
-            ['/faq', 'FAQ'],
+            ['/about',   'About Us'],
+            ['/booking','Book Now'],
+            ['/faq',    'FAQ'],
           ].map(([href, label]) => (
-            <Link
-              key={href}
-              href={href}
-              style={{
-                color: '#FFFFFF',
-                textDecoration: 'none',
-                whiteSpace: 'nowrap',
-              }}
-            >
+            <Link key={href} href={href}>
               {label}
             </Link>
           ))}
         </nav>
 
-        {/* CTA */}
-        <div
-          style={{
-            gridArea: 'cta',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            textAlign: 'center',
-            lineHeight: 1.2,
-          }}
-        >
-          <p
-            style={{
-              fontFamily: 'Lora, serif',
-              fontSize: 'clamp(16px, 1.2vw, 20px)',
-              color: '#E5948B',
-              margin: 0,
-              padding: 0,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-            }}
-          >
-            Ready to book your next piece?
-            <Link
-              href="/booking"
-              style={{
-                fontFamily: 'Sancreek, serif',
-                fontSize: 'clamp(28px, 3.5vw, 44px)',
-                color: '#FFFFFF',
-                textDecoration: 'none',
-                whiteSpace: 'nowrap',
-                transition: 'transform 0.2s ease',
-                lineHeight: 1.1,
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateX(4px)')}
-              onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateX(0)')}
-            >
-              Let&apos;s Chat →
+        {/* CENTER COLUMN: Logo and CTA */}
+        <div className="footer-center">
+          <p className="footer-logo-text">Green Sparrow Tattoo Co.</p>
+          <p className="footer-cta">
+            Ready to book your next piece?{' '}
+            <Link href="/booking" className="cta-button">
+              Book Now! →
             </Link>
           </p>
         </div>
 
-        {/* SOCIALS */}
-        <div
-          className="footer-socials"
-          style={{
-            gridArea: 'socials',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            alignSelf: 'stretch',
-            alignItems: 'flex-end',
-            fontFamily: 'Sancreek, serif',
-            fontSize: 'clamp(13px, 0.9vw, 16px)',
-            textTransform: 'uppercase',
-            letterSpacing: '1.5px',
-          }}
-        >
-          {[
-            ['https://www.instagram.com/greensparrowtattoo.co', 'Instagram'],
-            ['https://www.facebook.com/people/Green-Sparrow-Tattoo-Co/61575630917427/', 'Facebook'],
-            ['https://www.tiktok.com/@greensparrowtattooco', 'TikTok'],
-          ].map(([href, label]) => (
-            <a
-              key={label}
-              href={href}
+        {/* RIGHT COLUMN: Socials & Address */}
+        <div className="footer-right">
+          <div className="footer-socials" aria-label="Social media links">
+            <Link
+              href="https://instagram.com/greensparrowtattoo.co"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: '#FFFFFF', textDecoration: 'none' }}
             >
-              {label}
-            </a>
-          ))}
-        </div>
-
-        {/* SVG LOGO CENTERED */}
-        <div
-          style={{
-            gridArea: 'logo',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-            padding: 0,
-            marginTop: '-1rem',
-          }}
-        >
-          <svg
-            viewBox="0 0 2200 100"
-            preserveAspectRatio="xMidYMid meet"
-            style={{
-              width: 'clamp(320px, 90vw, 1600px)',
-              height: 'clamp(40px, 8vw, 100px)',
-              fill: '#FFFFFF',
-              stroke: '#FFFFFF',
-              strokeWidth: 2,
-              display: 'block',
-            }}
-            aria-hidden="true"
-          >
-            <text
-              x="50%"
-              y="50%"
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fontFamily="'Sancreek', serif"
-              fontSize="clamp(32px, 6vw, 72px)"
+              Instagram
+            </Link>
+            <Link
+              href="https://facebook.com/Green-Sparrow-Tattoo-Co"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              Green Sparrow Tattoo Co.
-            </text>
-          </svg>
+              Facebook
+            </Link>
+            <Link
+              href="https://tiktok.com/@greensparrowtattooco"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              TikTok
+            </Link>
+          </div>
+          <address className="footer-address">
+            430 N. Dobson Rd<br />
+            Unit 109<br />
+            Mesa, AZ 85201<br />
+            <Link href="tel:+16022093099">(602) 209-3099</Link><br />
+            <Link
+              href="https://maps.google.com/?q=Green+Sparrow+Tattoo+Co."
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Open in Maps →
+            </Link>
+          </address>
         </div>
+      </div>
 
-        {/* ADDRESS */}
-        <address
-          className="footer-address"
-          style={{
-            gridArea: 'address',
-            fontFamily: 'Lora, serif',
-            fontSize: 'clamp(13px,0.9vw,15px)',
-            lineHeight: 1.5,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '.25rem',
-            textAlign: 'center',
-          }}
-        >
-          430&nbsp;N.&nbsp;Dobson&nbsp;Rd.
-          <span>Unit&nbsp;109</span>
-          <span>Mesa,&nbsp;AZ&nbsp;85201</span>
-          <a
-            href="tel:+16022093099"
-            style={{
-              color: '#E5948B',
-              textDecoration: 'none',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            (602)&nbsp;209-3099
-          </a>
-          <a
-            href="https://maps.google.com/?q=Green+Sparrow+Tattoo+Co."
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              color: '#E5948B',
-              textDecoration: 'none',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            Open&nbsp;in&nbsp;Maps&nbsp;→
-          </a>
-        </address>
-      </footer>
-
-      {/* MOBILE OVERRIDES */}
       <style jsx>{`
-        @media (max-width: 768px) {
-          .footer {
-            display: flex !important;
+        .footer {
+          background: linear-gradient(
+              rgba(44, 32, 22, 0.85),
+              rgba(44, 32, 22, 0.85)
+            ),
+            url('/images/background.png') center/cover no-repeat;
+          color: #fff;
+          border-top: 2px solid #687357;
+        }
+
+        .footer-container {
+          display: grid;
+          grid-template-columns: 1fr auto 1fr;
+          grid-template-areas: "nav center right";
+          align-items: start;
+          padding: 2.5rem 3rem;
+          gap: 2rem;
+        }
+
+        .footer-nav {
+          grid-area: nav;
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+          font-family: 'Lora', serif;
+          text-transform: uppercase;
+        }
+
+        .footer-nav a {
+          color: #fff;
+          text-decoration: none;
+        }
+
+        .footer-center {
+          grid-area: center;
+          text-align: center;
+        }
+
+        .footer-logo-text {
+          font-family: 'Sancreek', cursive;
+          font-size: 2.5rem;
+          margin-bottom: 1rem;
+        }
+
+        .footer-cta {
+          font-family: 'Lora', serif;
+          font-size: 1.125rem;
+          color: #e5948b;
+        }
+
+        .cta-button {
+          font-family: 'Sancreek', cursive;
+          font-size: 1.75rem;
+          color: #fff;
+          text-decoration: none;
+          margin-left: 0.5rem;
+          transition: transform 0.2s ease;
+        }
+
+        .cta-button:hover,
+        .cta-button:focus {
+          transform: translateX(4px);
+        }
+
+        .footer-right {
+          grid-area: right;
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+          align-items: flex-end;
+        }
+
+        .footer-socials {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          font-family: 'Sancreek', cursive;
+        }
+
+        .footer-socials a {
+          color: #fff;
+          text-decoration: none;
+        }
+
+        .footer-address {
+          font-family: 'Lora', serif;
+          font-size: 0.95rem;
+          line-height: 1.4;
+          text-align: right;
+        }
+
+        .footer-address a {
+          color: #e5948b;
+          text-decoration: none;
+        }
+
+        /* MOBILE (≤640px) */
+        @media (max-width: 640px) {
+          .footer-container {
+            display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
-            padding: 2rem 1rem !important;
-            gap: 2rem !important;
+            padding: 2rem 1rem;
+            gap: 2rem;
           }
 
           .footer-nav,
           .footer-socials,
           .footer-address {
-            align-items: center !important;
+            align-items: center;
             text-align: center;
           }
 
-          .footer-socials {
-            flex-direction: row !important;
-            justify-content: center !important;
-            gap: 1.25rem !important;
+          .footer-right {
+            align-items: center;
           }
 
-          svg {
-            max-width: 92vw !important;
+          .footer-logo-text {
+            font-size: 2rem;
           }
 
-          span,
-          a,
-          address {
-            white-space: normal !important;
+          .cta-button {
+            display: block;
+            margin: 0.5rem auto 0;
+            font-size: 1.5rem;
           }
         }
+
+        /* Screen-reader only */
+        .sr-only {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border: 0;
+        }
       `}</style>
-    </div>
+    </footer>
   );
 }
