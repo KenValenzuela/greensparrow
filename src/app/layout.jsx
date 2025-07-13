@@ -5,7 +5,7 @@ import Footer from '@/components/Footer';
 import LoadingScreen from '@/components/LoadingScreen';
 import LenisProvider from '@/components/LenisProvider';
 import AOSWrapper from '@/components/AOSWrapper';
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 export const metadata = {
   title: 'Green Sparrow Tattoo',
   description: 'Experience tattoo artistry and visual storytelling',
