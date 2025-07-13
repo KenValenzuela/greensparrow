@@ -1,11 +1,15 @@
 import Script from 'next/script';
 import 'src/styles/globals.css';
+
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import LoadingScreen from '@/components/LoadingScreen';
 import LenisProvider from '@/components/LenisProvider';
 import AOSWrapper from '@/components/AOSWrapper';
-import { SpeedInsights } from "@vercel/speed-insights/next"
+
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/react';
+
 export const metadata = {
   title: 'Green Sparrow Tattoo',
   description: 'Experience tattoo artistry and visual storytelling',
@@ -31,17 +35,22 @@ export default function RootLayout({ children }) {
           src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
           strategy="afterInteractive"
         />
+
         <LoadingScreen>
           <LenisProvider>
             <AOSWrapper>
               <Navbar />
-              <main id="main" role="main" >
+              <main id="main" role="main">
                 {children}
               </main>
               <Footer />
             </AOSWrapper>
           </LenisProvider>
         </LoadingScreen>
+
+        {/* ✅ Vercel Analytics */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
