@@ -2,34 +2,36 @@
 
 import { SignJWT } from 'jose';
 
-const PASS   = process.env.ADMIN_PASS;          // server-only
-const SECRET = process.env.ADMIN_JWT_SECRET;    // server-only
-
-if (!SECRET) {
-  throw new Error(
-    'ADMIN_JWT_SECRET is missing. Set it in your `.env` / Vercel env vars.'
-  );
-}
+const encoder = new TextEncoder();
 
 /* ───────── helper to sign JWT ───────── */
-const encoder = new TextEncoder();
-async function signAdminJWT() {
+async function signAdminJWT(secret) {
   return new SignJWT({ admin: true })
     .setProtectedHeader({ alg: 'HS256' })
     .setExpirationTime('2h')
-    .sign(encoder.encode(SECRET));
+    .sign(encoder.encode(secret));
 }
 
 /* ───────── route handler ────────────── */
 export async function POST(req) {
-  /* ---------- 0. env-var sanity ---------- */
-  if (!PASS)
+  const PASS   = process.env.ADMIN_PASS;
+  const SECRET = process.env.ADMIN_JWT_SECRET;
+
+  if (!SECRET) {
     return new Response(
-      JSON.stringify({ error: 'ADMIN_PASS env var not set' }),
+      JSON.stringify({ error: 'Missing ADMIN_JWT_SECRET' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
+  }
 
-  /* ---------- 1. parse body -------------- */
+  if (!PASS) {
+    return new Response(
+      JSON.stringify({ error: 'Missing ADMIN_PASS' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
+  // ---------- 1. parse body --------------
   let body;
   try {
     body = await req.json();
@@ -48,17 +50,18 @@ export async function POST(req) {
     );
   }
 
-  /* ---------- 2. verify pass ------------- */
-  if (password !== PASS)
+  // ---------- 2. verify pass -------------
+  if (password !== PASS) {
     return new Response(
       JSON.stringify({ success: false, error: 'unauth' }),
       { status: 401, headers: { 'Content-Type': 'application/json' } }
     );
+  }
 
-  /* ---------- 3. mint JWT --------------- */
-  const jwt = await signAdminJWT();
+  // ---------- 3. mint JWT ---------------
+  const jwt = await signAdminJWT(SECRET);
 
-  /* ---------- 4. set cookie -------------- */
+  // ---------- 4. set cookie --------------
   const dev   = process.env.NODE_ENV !== 'production';
   const cookie = [
     `admin_auth=${jwt}`,
@@ -80,5 +83,4 @@ export async function POST(req) {
   });
 }
 
-/* ───────── optional method guard (app router) ───────── */
-export const dynamic = 'force-dynamic'; // ensure edge caching doesn’t interfere
+export const dynamic = 'force-dynamic';
