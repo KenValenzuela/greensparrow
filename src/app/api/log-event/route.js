@@ -3,7 +3,7 @@
  * Added defensive typing + default fallbacks.
  */
 
-import { supabase } from '@/utils/supabaseClient';
+import {supabase} from '@/utils/supabaseClient';
 
 export async function POST(req) {
   try {
@@ -16,7 +16,7 @@ export async function POST(req) {
       session_id       = null,
       metadata         = {},
     } = await req.json();
-
+    d
     const { error } = await supabase.from('booking_events').insert([
       {
         event_name,

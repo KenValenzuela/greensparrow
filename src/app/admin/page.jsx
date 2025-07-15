@@ -1,47 +1,44 @@
+// app/(admin)/page.jsx              ← replaces the entire file
 'use client';
 
-import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import { format } from 'date-fns';
-import { Bar, Line, Pie } from 'react-chartjs-2';
+import {useEffect, useState} from 'react';
+import {createClient} from '@supabase/supabase-js';
+import {format} from 'date-fns';
+import {Bar, Line, Pie} from 'react-chartjs-2';
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
   ArcElement,
   BarElement,
-  PointElement,
-  LineElement,
-  Tooltip,
+  CategoryScale,
+  Chart as ChartJS,
   Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Tooltip,
 } from 'chart.js';
 
 ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  ArcElement,
-  BarElement,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend
+    CategoryScale, LinearScale, ArcElement,
+    BarElement, PointElement, LineElement,
+    Tooltip, Legend,
 );
 
-/* ────────────────────────────────────────────
-   Supabase public client (anon key only)
-   ──────────────────────────────────────────── */
+/* ───────────────────────────────
+   Supabase public client (anon)
+   ─────────────────────────────── */
 const supa = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
 );
 
 export default function AdminDashboard() {
   /* ───────── state ───────── */
-  const [authed, setAuthed]   = useState(false);
-  const [load,   setLoad]     = useState(true);
-  const [book,   setBook]     = useState([]);
-  const [ev,     setEv]       = useState([]);
-  const [edit,   setEdit]     = useState(null);
+  const [authed, setAuthed] = useState(false);
+  const [load, setLoad] = useState(true);
+  const [book, setBook] = useState([]);
+  const [ev, setEv] = useState([]);
+  const [edit, setEdit] = useState(null);          // edit booking modal
+  const [compose, setCompose] = useState(null);          // email compose modal
 
   /* ───────── auth cookie ─── */
   useEffect(() => {
@@ -51,11 +48,10 @@ export default function AdminDashboard() {
   /* ───────── login form ──── */
   async function login(e) {
     e.preventDefault();
-    const pwd = e.target.password.value;
-    const r   = await fetch('/api/login-admin', {
+    const r = await fetch('/api/login-admin', {
       method : 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body   : JSON.stringify({ password: pwd }),
+      body: JSON.stringify({password: e.target.password.value}),
     });
     r.ok ? setAuthed(true) : alert('Wrong password');
   }
@@ -70,6 +66,7 @@ export default function AdminDashboard() {
         .from('bookings')
         .select('*')
         .order('created_at', { ascending: false });
+
       const { data: eData } = await supa
         .from('booking_events')
         .select('*')
@@ -92,17 +89,24 @@ export default function AdminDashboard() {
     setBook((b) => b.map((x) => (x.id === id ? { ...x, ...changes } : x)));
   }
 
-  async function resendEmail(id) {
-    const r = await fetch(`/api/admin/send-email?id=${id}`, { method: 'POST' });
-    r.ok ? alert('Email resent') : alert('Email failed');
+  /* ───────── send email ───── */
+  async function sendEmail({id, subject, message}) {
+    const r = await fetch('/api/admin/send-email', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({id, subject, message}),
+    });
+    if (!r.ok) return alert('Email failed');
+    alert('Email sent');
+    setCompose(null);
   }
 
   /* ───────── chart helpers ─ */
   const weekly = (() => {
     const map = {};
     book.forEach((b) => {
-      const k = format(new Date(b.created_at), 'yyyy-ww');
-      map[k]  = (map[k] || 0) + 1;
+      const key = format(new Date(b.created_at), 'yyyy-ww');
+      map[key] = (map[key] || 0) + 1;
     });
     return {
       labels   : Object.keys(map),
@@ -112,9 +116,10 @@ export default function AdminDashboard() {
 
   const bySrc = (() => {
     const map = {};
-    ev.filter((x) => x.event_name === 'booking_submitted').forEach((e) => {
-      map[e.source || 'Other'] = (map[e.source || 'Other'] || 0) + 1;
-    });
+    ev.filter((x) => x.event_name === 'booking_submitted')
+        .forEach((e) => {
+          map[e.source || 'Other'] = (map[e.source || 'Other'] || 0) + 1;
+        });
     return {
       labels   : Object.keys(map),
       datasets : [{ data: Object.values(map), backgroundColor: ['#e4938a','#9ad0f5','#bada55','#e8b562'] }],
@@ -123,7 +128,10 @@ export default function AdminDashboard() {
 
   const byStyle = (() => {
     const map = {};
-    book.forEach((b) => (b.preferred_style || []).forEach((s) => (map[s] = (map[s] || 0) + 1)));
+    book.forEach((b) => (b.preferred_style || [])
+        .forEach((s) => {
+          map[s] = (map[s] || 0) + 1;
+        }));
     return {
       labels   : Object.keys(map),
       datasets : [{ label: 'Count', data: Object.values(map), backgroundColor: '#9ad0f5' }],
@@ -131,7 +139,7 @@ export default function AdminDashboard() {
   })();
 
   /* ───────── render ──────── */
-  if (!authed)
+  if (!authed) {
     return (
       <Section>
         <Panel>
@@ -143,6 +151,7 @@ export default function AdminDashboard() {
         </Panel>
       </Section>
     );
+  }
 
   if (load) return <Section><p style={T}>Loading…</p></Section>;
 
@@ -180,7 +189,9 @@ export default function AdminDashboard() {
                 <td>{b.status}</td>
                 <td>{format(new Date(b.appointment_date), 'MMM dd')}</td>
                 <td><button onClick={() => setEdit(b)}>✏️</button></td>
-                <td><button onClick={() => resendEmail(b.id)}>📧</button></td>
+                <td>
+                  <button onClick={() => setCompose({...b, subject: 'Booking Update', message: ''})}>📧</button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -197,9 +208,8 @@ export default function AdminDashboard() {
                   value={edit.status}
                   onChange={(e) => setEdit({ ...edit, status: e.target.value })}
                 >
-                  {['Pending','Confirmed','Follow-up Sent','Completed','Cancelled'].map((s) => (
-                    <option key={s}>{s}</option>
-                  ))}
+                  {['Pending', 'Confirmed', 'Follow-up Sent', 'Completed', 'Cancelled']
+                      .map((s) => <option key={s}>{s}</option>)}
                 </select>
               </label>
               <label>
@@ -210,23 +220,68 @@ export default function AdminDashboard() {
                   onChange={(e) => setEdit({ ...edit, appointment_date: e.target.value })}
                 />
               </label>
-              <button onClick={() => patch(edit.id, { status: edit.status, appointment_date: edit.appointment_date })} style={Btn}>Save</button>
+              <button
+                  onClick={() => patch(edit.id, {
+                    status: edit.status,
+                    appointment_date: edit.appointment_date,
+                  })}
+                  style={Btn}
+              >
+                Save
+              </button>
               <button onClick={() => setEdit(null)} style={Btn}>Cancel</button>
             </div>
           </Modal>
+        )}
+
+        {/* Compose-email modal */}
+        {compose && (
+            <Modal>
+              <div style={ModalIn}>
+                <h3>Send Email to {compose.name}</h3>
+                <label>
+                  Subject{' '}
+                  <input
+                      style={{...I, border: '1px solid #ccc'}}
+                      value={compose.subject}
+                      onChange={(e) => setCompose({...compose, subject: e.target.value})}
+                  />
+                </label>
+                <label>
+                  Message{' '}
+                  <textarea
+                      rows={6}
+                      style={{...I, border: '1px solid #ccc', resize: 'vertical'}}
+                      value={compose.message}
+                      onChange={(e) => setCompose({...compose, message: e.target.value})}
+                  />
+                </label>
+                <button
+                    onClick={() => sendEmail({
+                      id: compose.id,
+                      subject: compose.subject,
+                      message: compose.message,
+                    })}
+                    style={Btn}
+                >
+                  Send
+                </button>
+                <button onClick={() => setCompose(null)} style={Btn}>Cancel</button>
+              </div>
+            </Modal>
         )}
       </Panel>
     </Section>
   );
 }
 
-/* ───────── styling helpers ─ */
+/* ───────── styling helpers (unchanged) ─ */
 const Section = (p) => (
   <section
     style={{
       minHeight: '100vh',
-      padding  : '4rem 1rem',
-      display  : 'flex',
+      padding: '4rem 1rem',
+      display: 'flex',
       justifyContent: 'center',
       backgroundImage:
         'linear-gradient(rgba(44,32,22,.95),rgba(44,32,22,.95)),url("/images/background.png")',
@@ -236,22 +291,20 @@ const Section = (p) => (
     {...p}
   />
 );
-
 const Panel = (p) => (
   <div
     style={{
       maxWidth: 1200,
-      width   : '100%',
+      width: '100%',
       background: '#2C2016D9',
-      padding   : 32,
+      padding: 32,
       borderRadius: 16,
-      color       : '#f1ede0',
-      fontFamily  : 'Lora,serif',
+      color: '#f1ede0',
+      fontFamily: 'Lora,serif',
     }}
     {...p}
   />
 );
-
 const H    = { fontSize: '2rem', fontFamily: 'Sancreek,cursive', color: '#e4938a' };
 const Sub  = { fontSize: '1.25rem', margin: '2rem 0 .5rem' };
 const T    = { color: '#f1ede0' };
@@ -272,4 +325,4 @@ const Modal = (p) => (
     {...p}
   />
 );
-const ModalIn = { background: '#fff', color: '#000', padding: 24, borderRadius: 8, minWidth: 300 };
+const ModalIn = {background: '#fff', color: '#000', padding: 24, borderRadius: 8, minWidth: 320};
