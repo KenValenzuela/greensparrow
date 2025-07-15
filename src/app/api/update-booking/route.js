@@ -6,6 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 
 /* ───────── static config ───────── */
 const encoder = new TextEncoder();
+
 const ALLOWED_FIELDS = new Set([
   'status',
   'appointment_date',
@@ -13,7 +14,7 @@ const ALLOWED_FIELDS = new Set([
   'message',
 ]);
 
-/** verify admin_auth cookie */
+/** verify admin_auth cookie using JWT */
 async function isAuthed(secret) {
   const token = cookies().get('admin_auth')?.value;
   if (!token || !secret) return false;
@@ -27,24 +28,28 @@ async function isAuthed(secret) {
 
 /* ───────── PATCH /admin/update-booking ───────── */
 export async function PATCH(req) {
-  // ── 0. check env vars (only at runtime, not build time) ──
+  // ── 0. Load required env vars (runtime-only) ──
   const URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const SECRET = process.env.ADMIN_JWT_SECRET;
 
   if (!URL || !SERVICE_KEY || !SECRET) {
-    return new Response(JSON.stringify({
-      error: 'Missing Supabase env vars (URL, SERVICE_ROLE_KEY, or ADMIN_JWT_SECRET)',
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Missing Supabase env vars (URL, SERVICE_ROLE_KEY, or ADMIN_JWT_SECRET)',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 
   const supa = createClient(URL, SERVICE_KEY, { auth: { persistSession: false } });
 
   // ── 1. auth guard ──
-  if (!(await isAuthed(SECRET))) {
+  const isAdmin = await isAuthed(SECRET);
+  if (!isAdmin) {
     return new Response(JSON.stringify({ error: 'unauth' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' },
@@ -63,6 +68,7 @@ export async function PATCH(req) {
   }
 
   const { id, changes } = body || {};
+
   if (!id || typeof id !== 'string') {
     return new Response(JSON.stringify({ error: 'missing id' }), {
       status: 400,
@@ -77,10 +83,12 @@ export async function PATCH(req) {
     });
   }
 
-  // ── 3. sanitise changes ──
+  // ── 3. sanitize allowed fields only ──
   const clean = {};
   for (const [k, v] of Object.entries(changes)) {
-    if (ALLOWED_FIELDS.has(k)) clean[k] = v;
+    if (ALLOWED_FIELDS.has(k)) {
+      clean[k] = v;
+    }
   }
 
   if (Object.keys(clean).length === 0) {
@@ -90,8 +98,12 @@ export async function PATCH(req) {
     });
   }
 
-  // ── 4. update bookings ──
-  const { error: updErr } = await supa.from('bookings').update(clean).eq('id', id);
+  // ── 4. update booking row ──
+  const { error: updErr } = await supa
+    .from('bookings')
+    .update(clean)
+    .eq('id', id);
+
   if (updErr) {
     return new Response(JSON.stringify({ error: updErr.message }), {
       status: 500,
@@ -99,7 +111,7 @@ export async function PATCH(req) {
     });
   }
 
-  // ── 5. insert audit log ──
+  // ── 5. audit log (event) ──
   await supa.from('booking_events').insert([
     {
       event_name: 'booking_updated',
@@ -112,11 +124,12 @@ export async function PATCH(req) {
     },
   ]);
 
-  // ── 6. done ──
+  // ── 6. success response ──
   return new Response(JSON.stringify({ success: true }), {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
   });
 }
 
+// Avoid edge runtime caching
 export const dynamic = 'force-dynamic';
