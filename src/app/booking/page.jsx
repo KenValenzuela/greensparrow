@@ -1,3 +1,6 @@
+// app/(booking)/page.jsx
+// Booking page wrapper – unchanged visual layout, “use client” added for full CSR.
+
 'use client';
 
 import BookingForm from '@/components/BookingForm';
@@ -41,7 +44,8 @@ export default function BookingPage() {
             lineHeight: 1.6,
           }}
         >
-          Use the form below to request an appointment—we’ll reach out to confirm. If you already know who you’d like to work with, feel free to message your preferred artist directly.
+            Use the form below to request an appointment—we’ll reach out to confirm. If you already
+            know who you’d like to work with, feel free to message your preferred artist directly.
         </p>
       </header>
 
