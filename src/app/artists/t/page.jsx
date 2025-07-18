@@ -9,13 +9,13 @@ export default function ArtistPage() {
   const slug = 't'; // ✅ Artist folder name and slug
 
   // ✅ Portrait file (must be in slug folder)
-  const portraitFilename = 't_portait.jpg';
+    const portraitFilename = 't_portait.webp';
 
   // ✅ Portfolio images (inside /work/)
   const workImages = [
-    't_1.jpeg', 't_2.jpeg', 't_3.jpeg', 't_4.jpeg', 't_5.jpeg', 't_6.jpeg',
-    't_7.jpeg', 't_8.jpeg', 't_9.jpeg', 't_10.jpeg', 't_11.jpeg', 't_12.jpeg',
-    't_13.jpeg', 't_14.jpeg', 't_15.jpeg', 't_16.jpeg', 't_17.jpeg', 't_18.jpeg',
+      't_1.webp', 't_2.webp', 't_3.webp', 't_4.webp', 't_5.webp', 't_6.webp',
+      't_7.webp', 't_8.webp', 't_9.webp', 't_10.webp', 't_11.webp', 't_12.webp',
+      't_13.webp', 't_14.webp', 't_15.webp', 't_16.webp', 't_17.webp', 't_18.webp',
   ];
 
   useEffect(() => {

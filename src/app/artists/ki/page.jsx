@@ -9,13 +9,13 @@ export default function ArtistPage() {
   const slug = 'ki'; // ✅ Artist folder name and slug
 
   // ✅ Portrait file (must be in slug folder)
-  const portraitFilename = 'ki_portrait.jpg';
+    const portraitFilename = 'ki_portrait.webp';
 
   // ✅ Portfolio images (inside /work/)
   const workImages = [
-    'ki_1.jpeg', 'ki_2.jpeg', 'ki_3.jpeg', 'ki_4.jpeg', 'ki_5.jpeg', 'ki_6.jpeg',
-    'ki_7.jpeg', 'ki_8.jpeg', 'ki_9.jpeg', 'ki_10.jpeg', 'ki_11.jpeg', 'ki_12.jpeg',
-    'ki_13.jpeg', 'ki_14.jpeg', 'ki_15.jpeg', 'ki_16.jpeg', 'ki_17.jpeg',
+      'ki_1.webp', 'ki_2.webp', 'ki_3.webp', 'ki_4.webp', 'ki_5.webp', 'ki_6.webp',
+      'ki_7.webp', 'ki_8.webp', 'ki_9.webp', 'ki_10.webp', 'ki_11.webp', 'ki_12.webp',
+      'ki_13.webp', 'ki_14.webp', 'ki_15.webp', 'ki_16.webp', 'ki_17.webp',
   ];
 
   useEffect(() => {
@@ -79,7 +79,7 @@ export default function ArtistPage() {
 
 const styles = {
   wrapper: {
-    backgroundImage: "url('/images/background.png')",
+      backgroundImage: "url('/images/background.webp')",
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     position: 'relative',

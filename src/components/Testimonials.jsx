@@ -7,7 +7,7 @@ const reviews = [
   {
     author: 'E M',
     text: "Ki is so talented! She freehanded two of my tattoos (large and detailed!) straight from her brain and I get complimented on them everywhere I go! She does a great job, has amazing skills, is knowledgeable, super clean and sanitary, and has great energy!! 10/10 recommend :)!",
-    photos: ['/images/reviews/em-2.jpg', '/images/reviews/em-1.jpg'],
+      photos: ['/images/reviews/em-2.webp', '/images/reviews/em-1.webp'],
   },
   {
     author: 'Cinthya Tizoc',
@@ -57,7 +57,7 @@ export default function Testimonials() {
   return (
     <section
       style={{
-        backgroundImage: "linear-gradient(rgba(30,26,23,0.92), rgba(30,26,23,0.92)), url('/images/background.png')",
+          backgroundImage: "linear-gradient(rgba(30,26,23,0.92), rgba(30,26,23,0.92)), url('/images/background.webp')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         padding: '5rem 1.5rem',

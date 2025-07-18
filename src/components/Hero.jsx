@@ -45,7 +45,7 @@ export default function Hero() {
         position: 'relative',
         overflow: 'hidden',
         backgroundImage:
-          'linear-gradient(rgba(44,32,22,0.9), rgba(44,32,22,0.9)), url("/images/background.png")',
+            'linear-gradient(rgba(44,32,22,0.9), rgba(44,32,22,0.9)), url("/images/background.webp")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',

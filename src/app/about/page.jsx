@@ -11,7 +11,7 @@ export default function AboutPage() {
       <main
         style={{
           backgroundImage:
-            "linear-gradient(rgba(30, 26, 23, 0.94), rgba(30, 26, 23, 0.94)), url('/images/background.png')",
+              "linear-gradient(rgba(30, 26, 23, 0.94), rgba(30, 26, 23, 0.94)), url('/images/background.webp')",
           backgroundSize: 'cover',
           backgroundRepeat: 'repeat',
           backgroundPosition: 'center top',
@@ -74,7 +74,7 @@ export default function AboutPage() {
               height: '100%',
             }}>
               <img
-                src="/images/owner_outside_shop.jpg"
+                  src="/images/owner_outside_shop.webp"
                 alt="Green Sparrow founder outside the shop"
                 loading="lazy"
                 style={{

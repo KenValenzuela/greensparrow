@@ -30,7 +30,7 @@ export default function EventsPage() {
     }
   }, []);
 
-  const flyerImages = ['1.png', '2.png', '3.png', '4.png'];
+    const flyerImages = ['1.webp', '2.webp', '3.webp', '4.webp'];
   const artistLinks = [
     { name: 'Joe', url: 'https://www.instagram.com/joseffdubbe_tattoo/' },
     { name: 'Mickey', url: 'https://www.instagram.com/cyber_dreamcore/' },
@@ -46,7 +46,7 @@ export default function EventsPage() {
   const backgroundStyle = {
     backgroundColor: '#1e1a17',
     backgroundImage:
-      "linear-gradient(rgba(30,26,23,0.92), rgba(30,26,23,0.92)), url('/images/background.png')",
+        "linear-gradient(rgba(30,26,23,0.92), rgba(30,26,23,0.92)), url('/images/background.webp')",
     backgroundSize: 'cover',
     backgroundPosition: 'center top',
     backgroundRepeat: 'no-repeat',

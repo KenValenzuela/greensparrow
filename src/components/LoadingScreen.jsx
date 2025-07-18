@@ -6,11 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import useTypewriter from '@/hooks/useTypewriter';
 
 const loadingImages = [
-  '/images/loading/axel_piercing.jpeg',
-  '/images/loading/jjk-leg-sleeve-t.jpeg',
-  '/images/loading/chameleon.jpeg',
-  '/images/loading/joe-flower.jpeg',
-  '/images/loading/fox-ki.jpeg',
+    '/images/loading/axel_piercing.webp',
+    '/images/loading/jjk-leg-sleeve-t.webp',
+    '/images/loading/chameleon.webp',
+    '/images/loading/joe-flower.webp',
+    '/images/loading/fox-ki.webp',
 ];
 
 const stackedCards = loadingImages.length;
@@ -106,7 +106,7 @@ export default function LoadingScreen({ children }) {
               inset: 0,
               zIndex: 50,
               backgroundImage:
-                "linear-gradient(rgba(44,32,22,0.85), rgba(44,32,22,0.85)), url('/images/background.png')",
+                  "linear-gradient(rgba(44,32,22,0.85), rgba(44,32,22,0.85)), url('/images/background.webp')",
               backgroundSize: 'cover',
               backgroundRepeat: 'repeat',
               backgroundPosition: 'center top',

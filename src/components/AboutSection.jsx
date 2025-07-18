@@ -10,13 +10,13 @@ export default function AboutSection({ variant = 'preview' }) {
   const isPreview = variant === 'preview';
 
   const images = [
-    '/images/inside-shop/entertainmentcenter.jpeg',
-    '/images/inside-shop/entrance_left.jpeg',
-    '/images/inside-shop/magazines.jpeg',
-    '/images/inside-shop/restroom.jpeg',
-    '/images/inside-shop/rooms.jpeg',
-    '/images/inside-shop/hallway.jpeg',
-    '/images/inside-shop/lobby.jpeg',
+      '/images/inside-shop/entertainmentcenter.webp',
+      '/images/inside-shop/entrance_left.webp',
+      '/images/inside-shop/magazines.webp',
+      '/images/inside-shop/restroom.webp',
+      '/images/inside-shop/rooms.webp',
+      '/images/inside-shop/hallway.webp',
+      '/images/inside-shop/lobby.webp',
   ];
 
   return (
@@ -29,7 +29,7 @@ export default function AboutSection({ variant = 'preview' }) {
         gap: '2rem',
         padding: isPreview ? '4rem 1.5rem' : '6rem 1.5rem',
         color: '#F1EDE0',
-        backgroundImage: `linear-gradient(rgba(30,26,23,0.92), rgba(30,26,23,0.92)), url('/images/background.png')`,
+          backgroundImage: `linear-gradient(rgba(30,26,23,0.92), rgba(30,26,23,0.92)), url('/images/background.webp')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center top',
         backgroundRepeat: 'no-repeat',

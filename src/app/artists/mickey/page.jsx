@@ -9,10 +9,10 @@ export default function ArtistPage() {
   const slug = 'mickey'; // ✅ Artist folder name and slug
 
   // ✅ Set portrait file name (must be in slug folder, not /work)
-  const portraitFilename = 'mickey_portrait.PNG'; // ← your portrait file here
+    const portraitFilename = 'mickey_portrait.webp'; // ← your portrait file here
 
   // ✅ List all portfolio work image filenames (inside /work/)
-  const workImages = ['mickey_1.jpeg','mickey_2.jpeg','mickey_3.jpeg','mickey_4.jpeg','mickey_6.jpeg','mickey_7.jpeg','mickey_8.jpeg','mickey_9.jpeg','mickey_10.jpeg','mickey_11.jpeg','mickey_12.jpeg','mickey_13.jpeg',];
+    const workImages = ['mickey_1.webp', 'mickey_2.webp', 'mickey_3.webp', 'mickey_4.webp', 'mickey_6.webp', 'mickey_7.webp', 'mickey_8.webp', 'mickey_9.webp', 'mickey_10.webp', 'mickey_11.webp', 'mickey_12.webp', 'mickey_13.webp',];
 
   useEffect(() => {
     AOS.init({ duration: 600, once: true });
@@ -78,7 +78,7 @@ export default function ArtistPage() {
 
 const styles = {
   wrapper: {
-    backgroundImage: "url('/images/background.png')",
+      backgroundImage: "url('/images/background.webp')",
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     position: 'relative',

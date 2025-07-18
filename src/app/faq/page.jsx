@@ -69,7 +69,7 @@ const sections = [
             </p>
             <img
               loading="lazy"
-              src="/images/shop-image.png"
+              src="/images/shop-image.webp"
               alt="Aftercare Kit"
               style={{
                 marginTop: '1rem',
@@ -202,7 +202,7 @@ export default function FAQPage() {
 
 const styles = {
   wrapper: {
-    backgroundImage: "url('/images/background.png')",
+      backgroundImage: "url('/images/background.webp')",
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     minHeight: '100vh',

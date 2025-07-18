@@ -9,10 +9,10 @@ export default function ArtistPage() {
   const slug = 'mia'; // ✅ Artist folder name and slug
 
   // ✅ Set portrait file name (must be in slug folder, not /work)
-  const portraitFilename = 'mia_portrait.jpg'; // ← your portrait file here
+    const portraitFilename = 'mia_portrait.webp'; // ← your portrait file here
 
   // ✅ List all portfolio work image filenames (inside /work/)
-  const workImages = ['mia_1.jpeg','mia_2.jpeg','mia_3.jpeg','mia_4.jpeg','mia_5.jpeg','mia_6.jpeg'];
+    const workImages = ['mia_1.webp', 'mia_2.webp', 'mia_3.webp', 'mia_4.webp', 'mia_5.webp', 'mia_6.webp'];
 
   useEffect(() => {
     AOS.init({ duration: 600, once: true });
@@ -75,7 +75,7 @@ export default function ArtistPage() {
 
 const styles = {
   wrapper: {
-    backgroundImage: "url('/images/background.png')",
+      backgroundImage: "url('/images/background.webp')",
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     position: 'relative',

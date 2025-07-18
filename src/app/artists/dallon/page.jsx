@@ -9,10 +9,10 @@ export default function ArtistPage() {
   const slug = 'dallon'; // ✅ Artist folder name and slug
 
   // ✅ Set portrait file name (must be in slug folder, not /work)
-  const portraitFilename = 'dallon_portrait.jpg'; // ← your portrait file here
+    const portraitFilename = 'dallon_portrait.webp'; // ← your portrait file here
 
   // ✅ List all portfolio work image filenames (inside /work/)
-  const workImages = ['dallon_1.jpeg','dallon_2.jpeg','dallon_3.jpeg','dallon_4.jpeg','dallon_5.jpeg','dallon_6.jpeg','dallon_7.jpeg'];
+    const workImages = ['dallon_1.webp', 'dallon_2.webp', 'dallon_3.webp', 'dallon_4.webp', 'dallon_5.webp', 'dallon_6.webp', 'dallon_7.webp'];
 
   useEffect(() => {
     AOS.init({ duration: 600, once: true });
@@ -69,7 +69,7 @@ Dallon Oracle is a lifelong artist and current art major at Arizona State Univer
 
 const styles = {
   wrapper: {
-    backgroundImage: "url('/images/background.png')",
+      backgroundImage: "url('/images/background.webp')",
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     position: 'relative',

@@ -79,7 +79,7 @@ export default function Footer() {
               rgba(44, 32, 22, 0.85),
               rgba(44, 32, 22, 0.85)
             ),
-            url('/images/background.png') center/cover no-repeat;
+            url('/images/background.webp') center/cover no-repeat;
           color: #fff;
           border-top: 2px solid #687357;
         }

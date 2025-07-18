@@ -1,34 +1,39 @@
+// app/api/book/route.js
+// POST /api/book  ← save booking + trigger confirm email
+
 import { supabase } from '@/utils/supabaseClient';
 
 const EMAIL_FN_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/email-booking-confirm`;
-const AUTH_HEADER   = { Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}` };
+const AUTH_HEADER = {Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`};
 
-// ───────── helpers ─────────
+/* cookie → object */
 const parseCookies = (str = '') =>
   Object.fromEntries(
     str.split(';').map((c) => {
       const [k, ...v] = c.trim().split('=');
       return [decodeURIComponent(k), decodeURIComponent(v.join('='))];
-    })
+    }),
   );
 
 export async function POST(req) {
   try {
-    // ── 1. Inputs ──
+      /* 1. inputs */
     const {
       name,
       email,
       phone,
       message,
+        placement,
       preferred_artist,
       preferred_style,
       customer_type,
       appointment_date,
+        appointment_end,
       images = [],
     } = await req.json();
 
-    // ── 2. Upsert / lookup ──
-    const [first_name, ...rest] = name.split(' ');
+      /* 2. upsert customer */
+      const [first_name, ...rest] = name.trim().split(' ');
     const { data: customer, error: custErr } = await supabase
       .from('customers')
       .upsert(
@@ -39,14 +44,14 @@ export async function POST(req) {
           phone,
           customer_type,
         },
-        { onConflict: 'email' }
+          {onConflict: 'email'},
       )
       .select('id')
       .single();
-
     if (custErr) throw custErr;
     const customer_id = customer.id;
 
+      /* 3. lookup artist (optional) */
     let artist_id = null;
     if (preferred_artist) {
       const { data: artist, error: artErr } = await supabase
@@ -58,16 +63,19 @@ export async function POST(req) {
       artist_id = artist?.id || null;
     }
 
-    // ── 3. Insert booking ──
+      /* 4. insert booking */
     const { data: booking, error: bookErr } = await supabase
       .from('bookings')
       .insert([
         {
           customer_id,
           preferred_artist: artist_id,
+            preferred_style,
           message,
+            placement,
           appointment_date,
-          images, // array of storage paths
+            appointment_end,
+            images, // storage paths
         },
       ])
       .select('id')
@@ -75,23 +83,10 @@ export async function POST(req) {
     if (bookErr) throw bookErr;
     const booking_id = booking.id;
 
-    // ── 4. Link styles (pivot) ──
-    if (Array.isArray(preferred_style) && preferred_style.length) {
-      const { data: stylesRows, error: styleErr } = await supabase
-        .from('styles')
-        .select('id')
-        .in('style_name', preferred_style);
-      if (styleErr) throw styleErr;
-
-      await supabase.from('booking_styles').insert(
-        stylesRows.map(({ id }) => ({ booking_id, style_id: id }))
-      );
-    }
-
-    // ── 5. Analytics event ──
-    const cookies = parseCookies(req.headers.get('cookie'));
-    const session_id = cookies.session_id ?? crypto.randomUUID(); // fallback
-    const source =
+      /* 5. analytics event */
+      const cookies = parseCookies(req.headers.get('cookie'));
+      const session_id = cookies.session_id ?? crypto.randomUUID();
+      const source =
       cookies.utm_source ??
       new URL(req.headers.get('referer') || 'https://direct').hostname;
 
@@ -110,7 +105,7 @@ export async function POST(req) {
       },
     ]);
 
-    // ── 6. Fire transactional email via Supabase Edge Function (Resend) ──
+      /* 6. fire confirm email (Edge Function → Resend) */
     await fetch(EMAIL_FN_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...AUTH_HEADER },
@@ -120,9 +115,11 @@ export async function POST(req) {
         email,
         phone,
         message,
+          placement,
         preferred_artist,
         preferred_style,
         appointment_date,
+          appointment_end,
         images,
       }),
     });
@@ -132,7 +129,7 @@ export async function POST(req) {
     console.error('[book] API error:', err);
     return new Response(
       JSON.stringify({ success: false, error: err.message }),
-      { status: 500 }
+        {status: 500},
     );
   }
 }

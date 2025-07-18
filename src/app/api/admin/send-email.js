@@ -1,54 +1,58 @@
-// pages/api/admin/send-email.js    ← new (or replace existing) API route
-import {Resend} from 'resend';
+// app/api/admin/send-email/route.js
+// POST /api/admin/send-email  ← manual follow-up from dashboard
+
 import {createClient} from '@supabase/supabase-js';
+import {Resend} from 'resend';
 
-// init Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// service account (to fetch user email)
-const supa = createClient(
+const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY, // service-role for RLS bypass
+    process.env.SUPABASE_SERVICE_ROLE_KEY, // bypass RLS
+    {auth: {persistSession: false}},
 );
+const resend = new Resend(process.env.RESEND_API_KEY);
+const FROM = 'Green Sparrow <noreply@greensparrow.app>';
 
-export default async function handler(req, res) {
-    if (req.method !== 'POST') return res.status(405).end();
+/* tiny html helper */
+const htmlWrap = (body) =>
+    `<!doctype html><html><body style="font-family: sans-serif; line-height:1.6;">${body}</body></html>`;
 
+export async function POST(req) {
     try {
-        const {id, subject, message} = req.body;
+        const {id, subject, message} = await req.json();
+        if (!id || !subject || !message)
+            return new Response(JSON.stringify({error: 'id, subject, message required'}), {status: 400});
 
-        // 1. look up booking to grab client email
-        const {data, error} = await supa
+        /* fetch booking + customer email */
+        const {data: booking, error} = await supabase
             .from('bookings')
-            .select('email,name')
+            .select('id, customer:customers ( email, first_name )')
             .eq('id', id)
             .single();
+        if (error) throw error;
 
-        if (error || !data?.email)
-            return res.status(400).json({error: 'Booking not found or missing email'});
+        const to = booking.customer.email;
 
-        // 2. send the email
+        /* send email */
         await resend.emails.send({
-            from: 'Green Sparrow <noreply@greensparrowtattoo.com>',
-            to: data.email,
-            subject: subject || 'Tattoo Booking Update',
-            html: `
-        <p>Hi ${data.name || ''},</p>
-        <p>${message.replace(/\n/g, '<br />')}</p>
-        <p style="margin-top:2rem">— Green Sparrow Tattoo Co.</p>
-      `,
+            from: FROM,
+            to,
+            subject,
+            html: htmlWrap(message.replace(/\n/g, '<br/>')),
         });
 
-        // 3. log event (optional)
-        await supa.from('booking_events').insert({
-            booking_id: id,
-            event_name: 'manual_email',
-            meta: {subject},
-        });
+        /* log event so funnel updates */
+        await supabase.from('booking_events').insert([
+            {
+                event_name: 'manual_email',
+                customer_email: to,
+                source: 'admin_dashboard',
+                metadata: {booking_id: id, subject},
+            },
+        ]);
 
-        return res.status(200).json({ok: true});
+        return new Response(JSON.stringify({ok: true}), {status: 200});
     } catch (err) {
-        console.error(err);
-        return res.status(500).json({error: 'Email failed'});
+        console.error('[admin/send-email] error:', err);
+        return new Response(JSON.stringify({error: err.message}), {status: 500});
     }
 }

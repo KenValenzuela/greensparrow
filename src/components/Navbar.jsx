@@ -64,7 +64,7 @@ export default function Navbar({ show = true }) {
           <div className="logo-block">
             <Link href="/" style={{ zIndex: 2 }}>
               <img
-                src="/images/green-sparrow-transparent.png"
+                  src="/images/green-sparrow-transparent.webp"
                 alt="Green Sparrow Tattoo Co."
                 className="logo-img"
                 style={{
@@ -145,7 +145,7 @@ export default function Navbar({ show = true }) {
               rgba(44, 32, 22, 0.85),
               rgba(44, 32, 22, 0.85)
             ),
-            url('/images/background.png');
+            url('/images/background.webp');
           background-size: cover;
           background-repeat: repeat-x;
           border-top: 2px solid #687357;

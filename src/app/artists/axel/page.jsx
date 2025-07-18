@@ -9,14 +9,14 @@ export default function ArtistPage() {
   const slug = 'axel'; // ✅ Artist folder name and slug
 
   // ✅ Set portrait file name (must be in slug folder, not /work)
-  const portraitFilename = 'axel_portrait.jpg';
+    const portraitFilename = 'axel_portrait.webp';
 
   // ✅ List all portfolio work image filenames (inside /work/)
   const workImages = [
-    'axel_1.jpeg','axel_2.jpeg','axel_3.jpeg',
-    'axel_4.jpeg','axel_5.jpeg','axel_6.jpeg',
-    'axel_7.jpeg','axel_9.jpeg','axel_10.jpeg',
-    'axel_11.jpeg','axel_15.jpeg','axel_12.jpeg',
+      'axel_1.webp', 'axel_2.webp', 'axel_3.webp',
+      'axel_4.webp', 'axel_5.webp', 'axel_6.webp',
+      'axel_7.webp', 'axel_9.webp', 'axel_10.webp',
+      'axel_11.webp', 'axel_15.webp', 'axel_12.webp',
   ];
 
   useEffect(() => {
@@ -86,7 +86,7 @@ export default function ArtistPage() {
 
 const styles = {
   wrapper: {
-    backgroundImage: "url('/images/background.png')",
+      backgroundImage: "url('/images/background.webp')",
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     position: 'relative',
