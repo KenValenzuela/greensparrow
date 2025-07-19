@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom/client';
 import Image from 'next/image';
 import ensureTurn from '@/lib/ensureTurn';
 
+// Artist image source map
 const artistImageMap = {
   Joe: ['joe_1.webp', 'joe_2.webp', 'joe_3.webp', 'joe_4.webp', 'joe_5.webp', 'joe_6.webp', 'joe_7.webp', 'joe_8.webp', 'joe_9.webp', 'joe_10.webp'],
   Mickey: ['mickey_1.webp', 'mickey_2.webp', 'mickey_3.webp', 'mickey_4.webp', 'mickey_6.webp', 'mickey_7.webp', 'mickey_8.webp', 'mickey_9.webp', 'mickey_10.webp', 'mickey_11.webp', 'mickey_12.webp', 'mickey_13.webp'],
@@ -34,6 +35,7 @@ export default function GalleryPage() {
   const [modal, setModal] = useState(null);
   const bookRef = useRef(null);
 
+  // Responsive layout
   useEffect(() => {
     const onResize = () => {
       const w = window.innerWidth;
@@ -46,6 +48,7 @@ export default function GalleryPage() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
+  // Dynamically resolve images based on artist selection
   const images = useMemo(() =>
           artist
               ? artistImageMap[artist].map(f => ({
@@ -60,57 +63,64 @@ export default function GalleryPage() {
               )
       , [artist]);
 
-  const per = meta.cols * meta.rows;
+  const perPage = meta.cols * meta.rows;
 
   const grids = useMemo(() => {
     const out = [];
-    for (let i = 0; i < images.length; i += per) out.push(images.slice(i, i + per));
+    for (let i = 0; i < images.length; i += perPage) {
+      out.push(images.slice(i, i + perPage));
+    }
     return out;
-  }, [images, per]);
+  }, [images, perPage]);
 
   const sheets = useMemo(() => {
-    const core = grids.map(g => ({type: 'grid', data: g}));
-    const all = [
+    const base = grids.map(g => ({type: 'grid', data: g}));
+    return [
       {type: 'cover'},
-      ...core,
-      ...(core.length % 2 === 0 ? [{type: 'end'}] : [])
+      ...base,
+      ...(base.length % 2 === 0 ? [{type: 'end'}] : [])
     ];
-    return all;
   }, [grids]);
 
+  // Render book with Turn.js
   useEffect(() => {
     let disposed = false;
+
     (async () => {
       await ensureTurn();
       if (disposed || !bookRef.current) return;
 
       const $ = window.$;
-      const $b = $(bookRef.current);
+      const $book = $(bookRef.current);
+
       try {
-        if ($b.data('turn')) $b.turn('destroy');
+        if ($book.data('turn')) $book.turn('destroy');
       } catch {
       }
-      $b.empty();
 
-      sheets.forEach((sh, idx) => {
+      $book.empty();
+
+      sheets.forEach(sh => {
         const $sheet = $('<div/>').addClass('page');
 
         if (sh.type === 'cover') {
           const $left = $('<div/>').addClass('page hard');
           const $right = $('<div/>').addClass('page hard');
 
-          const $coverLeft = $('<div/>')
+          $left.append(
+              $('<div/>')
               .addClass('coverHalf coverLeft')
               .html(`<p><strong>Welcome to Green Sparrow Tattoo Co.</strong></p>
-                   <p>Explore work from each of our unique artists and their styles.</p>`);
+                     <p>Explore the pages to see our artist work.</p>`)
+          );
 
-          const $coverRight = $('<div/>')
+          $right.append(
+              $('<div/>')
               .addClass('coverHalf coverRight')
-              .html('<span>📖 Tap arrows to begin</span>');
+                  .text('📖 Tap arrows to begin')
+          );
 
-          $left.append($coverLeft);
-          $right.append($coverRight);
-          $b.append($left, $right);
+          $book.append($left, $right);
           return;
         }
 
@@ -120,22 +130,23 @@ export default function GalleryPage() {
               .addClass('centerText')
               .text('✨ Thanks for viewing ✨')
               .appendTo($end);
-          $b.append($end);
+          $book.append($end);
           return;
         }
 
         const $grid = $('<div/>').addClass('grid').css({
           gridTemplateColumns: `repeat(${meta.cols}, 1fr)`,
-          gridTemplateRows: `repeat(${meta.rows}, 1fr)`
+          gridTemplateRows: `repeat(${meta.rows}, 1fr)`,
         }).appendTo($sheet);
 
         sh.data.forEach(img => {
-          const $cell = $('<div/>').addClass('cell').appendTo($grid);
+          const $cell = $('<div/>').addClass('cell').css('position', 'relative').appendTo($grid);
           ReactDOM.createRoot($cell[0]).render(
               <Image
                   src={img.src}
                   alt={img.alt}
                   fill
+                  loading="lazy"
                   sizes="(max-width:480px) 90vw, (max-width:768px) 45vw, 30vw"
                   style={{objectFit: 'cover', borderRadius: 6}}
                   onClick={e => {
@@ -146,10 +157,10 @@ export default function GalleryPage() {
           );
         });
 
-        $b.append($sheet);
+        $book.append($sheet);
       });
 
-      $b.turn({
+      $book.turn({
         width: size,
         height: size * (meta.rows / meta.cols),
         autoCenter: true,
@@ -173,33 +184,16 @@ export default function GalleryPage() {
   const nav = dir => window.$?.(bookRef.current).turn(dir);
 
   useEffect(() => {
-    const k = e => {
+    const handleKey = e => {
       if (e.key === 'ArrowLeft') nav('previous');
       if (e.key === 'ArrowRight') nav('next');
       if (e.key === 'Escape') setModal(null);
     };
-    window.addEventListener('keydown', k);
-    return () => window.removeEventListener('keydown', k);
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
   }, []);
 
-  const mobile = vw <= 320;
-  const barStyle = mobile
-      ? {
-        marginTop: '1rem',
-        marginBottom: 'auto',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        width: size,
-        display: 'flex',
-        justifyContent: 'center',
-        gap: 24,
-      }
-      : {
-        marginTop: 14,
-        display: 'flex',
-        justifyContent: 'center',
-        gap: 24,
-      };
+  const isMobile = vw <= 320;
 
   return (
       <main style={styles.main}>
@@ -211,7 +205,6 @@ export default function GalleryPage() {
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 0;
           box-sizing: border-box;
         }
         .grid {
@@ -227,6 +220,7 @@ export default function GalleryPage() {
           height: 100%;
           overflow: hidden;
           border-radius: 6px;
+          position: relative;
         }
         .centerText {
           font-family: 'Sancreek', cursive;
@@ -285,7 +279,14 @@ export default function GalleryPage() {
         </div>
 
         {sheets.length > 1 && (
-            <div style={barStyle}>
+            <div style={{
+              marginTop: isMobile ? '1rem' : 14,
+              display: 'flex',
+              justifyContent: 'center',
+              gap: 24,
+              width: size,
+              marginInline: 'auto',
+            }}>
               <button onClick={() => nav('previous')} disabled={page === 1} style={styles.barBtn}>‹</button>
               <button onClick={() => nav('next')} disabled={page === sheets.length} style={styles.barBtn}>›</button>
             </div>
