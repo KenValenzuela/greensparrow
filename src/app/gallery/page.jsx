@@ -1,12 +1,10 @@
-// src/app/gallery/page.jsx
 'use client';
 
-import React, {useState, useEffect, useMemo, useRef} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import ReactDOM from 'react-dom/client';
 import Image from 'next/image';
 import ensureTurn from '@/lib/ensureTurn';
 
-/* 1 ▸ DATA ------------------------------------------------------------ */
 const artistImageMap = {
   Joe: ['joe_1.webp', 'joe_2.webp', 'joe_3.webp', 'joe_4.webp', 'joe_5.webp', 'joe_6.webp', 'joe_7.webp', 'joe_8.webp', 'joe_9.webp', 'joe_10.webp'],
   Mickey: ['mickey_1.webp', 'mickey_2.webp', 'mickey_3.webp', 'mickey_4.webp', 'mickey_6.webp', 'mickey_7.webp', 'mickey_8.webp', 'mickey_9.webp', 'mickey_10.webp', 'mickey_11.webp', 'mickey_12.webp', 'mickey_13.webp'],
@@ -14,116 +12,139 @@ const artistImageMap = {
   Ki: ['ki_1.webp', 'ki_2.webp', 'ki_3.webp', 'ki_4.webp', 'ki_5.webp', 'ki_6.webp', 'ki_7.webp', 'ki_8.webp', 'ki_9.webp', 'ki_10.webp', 'ki_11.webp', 'ki_12.webp', 'ki_13.webp', 'ki_14.webp', 'ki_15.webp', 'ki_16.webp', 'ki_17.webp'],
   Axel: ['axel_1.webp', 'axel_2.webp', 'axel_3.webp', 'axel_4.webp', 'axel_5.webp', 'axel_6.webp', 'axel_7.webp', 'axel_9.webp', 'axel_10.webp', 'axel_11.webp', 'axel_12.webp', 'axel_15.webp'],
   Dallon: ['dallon_1.webp', 'dallon_2.webp', 'dallon_3.webp', 'dallon_4.webp', 'dallon_5.webp', 'dallon_6.webp', 'dallon_7.webp', 'dallon_8.webp'],
-  Mia: ['mia_1.webp', 'mia_2.webp', 'mia_3.webp', 'mia_4.webp', 'mia_5.webp', 'mia_6.webp']
+  Mia: ['mia_1.webp', 'mia_2.webp', 'mia_3.webp', 'mia_4.webp', 'mia_5.webp', 'mia_6.webp'],
 };
+
 const artists = Object.keys(artistImageMap);
 
-/* grid rules                                                          */
-const metaFor = w => (
-    w <= 360 ? {cols: 1, rows: 1} :     // super-narrow phones = big cell
+const metaFor = w =>
+    w <= 360 ? {cols: 1, rows: 1} :
         w <= 480 ? {cols: 1, rows: 2} :
             w <= 767 ? {cols: 2, rows: 2} :
-                {cols: 3, rows: 2}
-);
-const clampW = w => Math.max(320, Math.min(760, w * 0.94));
+                {cols: 3, rows: 2};
 
-/* 2 ▸ COMPONENT ------------------------------------------------------- */
+const clampW = w => Math.max(320, Math.min(720, w * 0.94));
+
 export default function GalleryPage() {
+  const [vw, setVw] = useState(360);
+  const [meta, setMeta] = useState(metaFor(360));
+  const [size, setSize] = useState(clampW(360));
   const [artist, setArtist] = useState(null);
-  const [meta, setMeta] = useState(() => metaFor(typeof window !== 'undefined' ? innerWidth : 1024));
-  const [size, setSize] = useState(() => clampW(typeof window !== 'undefined' ? innerWidth : 1024));
   const [page, setPage] = useState(1);
-  const [modal, setModal] = useState(null);        // {src,alt}
+  const [modal, setModal] = useState(null);
   const bookRef = useRef(null);
 
-  /* resize listener */
   useEffect(() => {
-    const fn = () => {
-      const w = innerWidth;
+    const onResize = () => {
+      const w = window.innerWidth;
+      setVw(w);
       setMeta(metaFor(w));
       setSize(clampW(w));
     };
-    addEventListener('resize', fn);
-    return () => removeEventListener('resize', fn);
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  /* image list */
-  const images = useMemo(() => (
-      artist
-          ? artistImageMap[artist].map(f => ({
-            src: `/images/artists/${artist.toLowerCase()}/work/${f}`,
-            alt: `${artist} work`
-          }))
-          : artists.flatMap(a => artistImageMap[a].map(f => ({
+  const images = useMemo(() =>
+          artist
+              ? artistImageMap[artist].map(f => ({
+                src: `/images/artists/${artist.toLowerCase()}/work/${f}`,
+                alt: `${artist} work`,
+              }))
+              : artists.flatMap(a =>
+                      artistImageMap[a].map(f => ({
             src: `/images/artists/${a.toLowerCase()}/work/${f}`,
-            alt: `${a} work`
-          })))
-  ), [artist]);
+                        alt: `${a} work`,
+                      }))
+              )
+      , [artist]);
 
-  /* paginate */
   const per = meta.cols * meta.rows;
+
   const grids = useMemo(() => {
-    const arr = [];
-    for (let i = 0; i < images.length; i += per) arr.push(images.slice(i, i + per));
-    return arr;
+    const out = [];
+    for (let i = 0; i < images.length; i += per) out.push(images.slice(i, i + per));
+    return out;
   }, [images, per]);
 
-  /* sheets array */
   const sheets = useMemo(() => {
-    const all = [{type: 'cover'}, ...grids.map(g => ({type: 'grid', data: g}))];
-    if (all.length % 2) all.push({type: 'end'});
+    const core = grids.map(g => ({type: 'grid', data: g}));
+    const all = [
+      {type: 'cover'},
+      ...core,
+      ...(core.length % 2 === 0 ? [{type: 'end'}] : [])
+    ];
     return all;
   }, [grids]);
 
-  /* flipbook build */
   useEffect(() => {
-    let gone = false;
+    let disposed = false;
     (async () => {
       await ensureTurn();
-      if (gone || !bookRef.current) return;
+      if (disposed || !bookRef.current) return;
 
-      const $ = window.$, $b = $(bookRef.current);
+      const $ = window.$;
+      const $b = $(bookRef.current);
       try {
         if ($b.data('turn')) $b.turn('destroy');
       } catch {
       }
       $b.empty();
 
-      sheets.forEach(sh => {
-        const $sheet = $('<div/>', {class: 'page'});
+      sheets.forEach((sh, idx) => {
+        const $sheet = $('<div/>').addClass('page');
 
         if (sh.type === 'cover') {
-          $('<div/>', {class: 'centerText', html: '<span>📖 Welcome!<br/>Swipe / tap arrows</span>'}).appendTo($sheet);
-        } else if (sh.type === 'end') {
-          $('<div/>', {class: 'centerText', html: '<span>✨ Thanks for viewing ✨</span>'}).appendTo($sheet);
-        } else {
-          const $grid = $('<div/>', {
-            class: 'grid', css: {
-              gridTemplateColumns: `repeat(${meta.cols},1fr)`,
-              gridTemplateRows: `repeat(${meta.rows},1fr)`
-            }
-          }).appendTo($sheet);
+          const $left = $('<div/>').addClass('page hard');
+          const $right = $('<div/>').addClass('page hard');
 
-          sh.data.forEach(img => {
-            const $cell = $('<div/>', {class: 'cell'}).appendTo($grid);
-            const wrap = document.createElement('div');
-            Object.assign(wrap.style, {position: 'relative', width: '100%', height: '100%', cursor: 'pointer'});
-            ReactDOM.createRoot(wrap).render(
-                <Image
-                    src={img.src}
-                    alt={img.alt}
-                    fill
-                    sizes="(max-width:480px) 90vw, (max-width:768px) 45vw, 30vw"
-                    style={{objectFit: 'cover'}}
-                    onClick={e => {
-                      e.stopPropagation();
-                      setModal(img);
-                    }}
-                />
-            );
-            $cell.append(wrap);
-          });
+          const $coverLeft = $('<div/>')
+              .addClass('coverHalf coverLeft')
+              .html(`<p><strong>Welcome to Green Sparrow Tattoo Co.</strong></p>
+                   <p>Explore work from each of our unique artists and their styles.</p>`);
+
+          const $coverRight = $('<div/>')
+              .addClass('coverHalf coverRight')
+              .html('<span>📖 Tap arrows to begin</span>');
+
+          $left.append($coverLeft);
+          $right.append($coverRight);
+          $b.append($left, $right);
+          return;
         }
+
+        if (sh.type === 'end') {
+          const $end = $('<div/>').addClass('page hard');
+          $('<div/>')
+              .addClass('centerText')
+              .text('✨ Thanks for viewing ✨')
+              .appendTo($end);
+          $b.append($end);
+          return;
+        }
+
+        const $grid = $('<div/>').addClass('grid').css({
+          gridTemplateColumns: `repeat(${meta.cols}, 1fr)`,
+          gridTemplateRows: `repeat(${meta.rows}, 1fr)`
+        }).appendTo($sheet);
+
+        sh.data.forEach(img => {
+          const $cell = $('<div/>').addClass('cell').appendTo($grid);
+          ReactDOM.createRoot($cell[0]).render(
+              <Image
+                  src={img.src}
+                  alt={img.alt}
+                  fill
+                  sizes="(max-width:480px) 90vw, (max-width:768px) 45vw, 30vw"
+                  style={{objectFit: 'cover', borderRadius: 6}}
+                  onClick={e => {
+                    e.stopPropagation();
+                    setModal(img);
+                  }}
+              />
+          );
+        });
 
         $b.append($sheet);
       });
@@ -132,14 +153,14 @@ export default function GalleryPage() {
         width: size,
         height: size * (meta.rows / meta.cols),
         autoCenter: true,
-        elevation: 70,
-        duration: 460,
-        easing: 'cubic-bezier(.25,1,.3,1)'
+        elevation: 60,
+        duration: 440,
+        easing: 'ease-in-out',
       }).bind('turned', (_, p) => setPage(p));
     })();
 
     return () => {
-      gone = true;
+      disposed = true;
       if (window.$) {
         try {
           window.$(bookRef.current).turn('destroy');
@@ -147,129 +168,228 @@ export default function GalleryPage() {
         }
       }
     };
-  }, [sheets, meta, size]);
+  }, [sheets, size, meta]);
 
-  /* nav helpers + key */
   const nav = dir => window.$?.(bookRef.current).turn(dir);
+
   useEffect(() => {
     const k = e => {
       if (e.key === 'ArrowLeft') nav('previous');
       if (e.key === 'ArrowRight') nav('next');
       if (e.key === 'Escape') setModal(null);
     };
-    addEventListener('keydown', k);
-    return () => removeEventListener('keydown', k);
+    window.addEventListener('keydown', k);
+    return () => window.removeEventListener('keydown', k);
   }, []);
 
-  return (
-      <main style={css.main}>
-        <h1 style={css.h1}>Gallery</h1>
-        <p style={css.sub}>{artist ? `Check out ${artist}’s work` : 'Check out work from all our artists'}</p>
+  const mobile = vw <= 320;
+  const barStyle = mobile
+      ? {
+        marginTop: '1rem',
+        marginBottom: 'auto',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        width: size,
+        display: 'flex',
+        justifyContent: 'center',
+        gap: 24,
+      }
+      : {
+        marginTop: 14,
+        display: 'flex',
+        justifyContent: 'center',
+        gap: 24,
+      };
 
-        <div style={css.filters}>
+  return (
+      <main style={styles.main}>
+        <style>{`
+        .page {
+          background: #1A1715;
+          width: 50%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        .grid {
+          display: grid;
+          width: 100%;
+          height: 100%;
+          gap: 12px;
+          padding: 1rem;
+          box-sizing: border-box;
+        }
+        .cell {
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          border-radius: 6px;
+        }
+        .centerText {
+          font-family: 'Sancreek', cursive;
+          font-size: 1.3rem;
+          color: #D6B46B;
+          text-align: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+        }
+        .coverHalf {
+          width: 100%;
+          height: 100%;
+          padding: 1.2rem;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          font-size: 1rem;
+          font-family: 'Lora', serif;
+          color: #EFE7D9;
+        }
+        .coverLeft {
+          text-align: right;
+          padding-right: 2rem;
+        }
+        .coverRight {
+          text-align: left;
+          font-family: 'Sancreek', cursive;
+          font-size: 1.3rem;
+          color: #D6B46B;
+        }
+      `}</style>
+
+        <h1 style={styles.h1}>Gallery</h1>
+        <p style={styles.sub}>
+          {artist ? `Check out ${artist}’s work` : 'Check out work from all our artists'}
+        </p>
+
+        <div style={styles.filters}>
           <button onClick={() => setArtist(null)} style={chip(!artist)}>All</button>
           {artists.map(a => (
               <button key={a} onClick={() => setArtist(a)} style={chip(artist === a)}>{a}</button>
         ))}
       </div>
 
-        <div style={css.spread}>
-          {/* faux margins / side-text */}
-          <div style={css.marginLeft}><span>← swipe</span></div>
-
-          <div style={css.bookWrap}>
-            <div ref={bookRef}
-                 style={{...css.book, width: size, height: size * (meta.rows / meta.cols)}}/>
-
-            {sheets.length > 1 && (
-                <>
-                  <button style={{...css.arrow, left: 14}}
-                          onClick={() => nav('previous')} disabled={page === 1}>‹
-                  </button>
-                  <button style={{...css.arrow, right: 14}}
-                          onClick={() => nav('next')} disabled={page === sheets.length}>›
-                  </button>
-                </>
-            )}
+        <div style={styles.spread}>
+          <div style={styles.bookWrap}>
+            <div ref={bookRef} style={{
+              ...styles.book,
+              width: size,
+              height: size * (meta.rows / meta.cols)
+            }}/>
           </div>
+        </div>
 
-          <div style={css.marginRight}><span>swipe →</span></div>
-      </div>
+        {sheets.length > 1 && (
+            <div style={barStyle}>
+              <button onClick={() => nav('previous')} disabled={page === 1} style={styles.barBtn}>‹</button>
+              <button onClick={() => nav('next')} disabled={page === sheets.length} style={styles.barBtn}>›</button>
+            </div>
+        )}
 
         {modal && (
-            <div style={css.modal} onClick={() => setModal(null)}>
-              <img src={modal.src} alt={modal.alt} style={css.modalImg}/>
+            <div style={styles.modal} onClick={() => setModal(null)}>
+              <img src={modal.src} alt={modal.alt} style={styles.modalImg}/>
         </div>
       )}
     </main>
   );
 }
 
-/* 3 ▸ STYLES ---------------------------------------------------------- */
 const palette = {
   brown: '#2B1E15',
-  page: '#1A1715',      // unified dark page background
+  page: '#1A1715',
   cream: '#EFE7D9',
   gold: '#D6B46B',
-  gray: '#6C6C6C'
+  gray: '#6C6C6C',
 };
 
-const css = {
+const styles = {
   main: {
-    padding: '3rem .8rem', minHeight: '100vh',
+    padding: '3rem .8rem',
+    minHeight: '100vh',
     background: `${palette.brown} url('/images/background.webp') center/cover`,
-    color: palette.cream, fontFamily: 'Lora,serif', textAlign: 'center',
-    display: 'flex', flexDirection: 'column', alignItems: 'center'
+    color: palette.cream,
+    fontFamily: 'Lora,serif',
+    textAlign: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
-  h1: {fontFamily: 'Sancreek,cursive', fontSize: '2.4rem', color: palette.gold, marginBottom: '.5rem'},
-  sub: {fontSize: '1rem', opacity: .9, marginBottom: '1.3rem'},
-  filters: {display: 'flex', flexWrap: 'wrap', gap: '.7rem', marginBottom: '1.8rem'},
-  spread: {display: 'flex', alignItems: 'center', gap: '10px'},
-  marginLeft: {
-    writingMode: 'vertical-rl', textOrientation: 'upright', fontSize: '.8rem',
-    opacity: .6, userSelect: 'none'
+  h1: {
+    fontFamily: 'Sancreek,cursive',
+    fontSize: '2.4rem',
+    color: palette.gold,
+    marginBottom: '.5rem',
   },
-  marginRight: {
-    writingMode: 'vertical-rl', textOrientation: 'upright', fontSize: '.8rem',
-    opacity: .6, userSelect: 'none'
+  sub: {
+    fontSize: '1rem',
+    opacity: 0.9,
+    marginBottom: '1.3rem',
   },
-  bookWrap: {position: 'relative', display: 'inline-flex', justifyContent: 'center'},
+  filters: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '.7rem',
+    marginBottom: '1.8rem',
+  },
+  spread: {
+    display: 'flex',
+    justifyContent: 'center',
+    width: '100%',
+    boxSizing: 'border-box',
+  },
+  bookWrap: {
+    position: 'relative',
+    width: '100%',
+    maxWidth: 760,
+    boxSizing: 'border-box',
+  },
   book: {
-    background: palette.page, padding: '1.2rem', borderRadius: '8px',
-    boxShadow: '0 22px 48px rgba(0,0,0,.55)', userSelect: 'none'
+    background: palette.page,
+    borderRadius: 8,
+    boxShadow: '0 22px 48px rgba(0,0,0,.55)',
+    overflow: 'hidden',
+    boxSizing: 'border-box',
   },
-  arrow: {
-    position: 'absolute', top: '50%', transform: 'translateY(-50%)',
-    fontSize: '2.6rem', color: palette.gold, background: 'none', border: 'none',
-    cursor: 'pointer', opacity: .32, transition: 'all .18s'
+  barBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: '50%',
+    border: 'none',
+    background: '#292523',
+    color: palette.gold,
+    fontSize: 26,
+    cursor: 'pointer',
   },
   modal: {
-    position: 'fixed', inset: 0, background: 'rgba(0,0,0,.92)',
-    display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 10000
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(0,0,0,.92)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10000,
   },
-  modalImg: {maxWidth: '96vw', maxHeight: '96vh', objectFit: 'contain', borderRadius: '10px'}
+  modalImg: {
+    maxWidth: '96vw',
+    maxHeight: '96vh',
+    objectFit: 'contain',
+    borderRadius: 10,
+  },
 };
 
 const chip = active => ({
-  padding: '.72rem 1.45rem', borderRadius: '999px', fontWeight: 600, fontSize: '.9rem',
+  padding: '.72rem 1.45rem',
+  borderRadius: 999,
+  fontWeight: 600,
+  fontSize: '.9rem',
   background: active ? palette.gold : palette.gray,
-  color: active ? '#111' : palette.cream, border: 'none', cursor: 'pointer',
-  transition: 'background .2s'
+  color: active ? '#111' : palette.cream,
+  border: 'none',
+  cursor: 'pointer',
 });
-
-/* global sheet css (dark page; no white) */
-if (typeof window !== 'undefined' && !document.getElementById('flip-css')) {
-  const rules = `
-    .page{background:${palette.page};padding:20px;box-sizing:border-box;border-radius:6px}
-    .centerText,.sheetT{display:flex;justify-content:center;align-items:center;height:100%;
-      font-family:'Sancreek',cursive;font-size:1.35rem;color:${palette.gold};text-align:center;padding:0 1rem}
-    .grid{display:grid;gap:14px;width:100%;height:100%}
-    .cell{border-radius:6px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.03)}
-    button[disabled]{opacity:.17;cursor:default}
-    button:hover:not([disabled]){opacity:.85;transform:scale(1.1)}
-  `;
-  const style = document.createElement('style');
-  style.id = 'flip-css';
-  style.textContent = rules;
-  document.head.appendChild(style);
-}
