@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import {useEffect, useRef, useState} from 'react';
+import {AnimatePresence, motion} from 'framer-motion';
 
 const reviews = [
   {
@@ -70,7 +70,7 @@ export default function Testimonials() {
         style={{
           fontFamily: 'Sancreek, cursive',
           fontSize: '2.5rem',
-          color: '#e8b562',
+            color: '#e39289',
           textAlign: 'center',
           textTransform: 'uppercase',
           letterSpacing: '1px',

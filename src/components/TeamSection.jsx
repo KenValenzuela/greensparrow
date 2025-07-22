@@ -1,14 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import {useEffect, useState} from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation, Pagination, A11y } from 'swiper/modules';
-import { motion } from 'framer-motion';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
+import {motion} from 'framer-motion';
 
 const artists = [
   {
@@ -63,29 +58,26 @@ const artists = [
 ];
 
 export default function TeamSection() {
-  const [width, setWidth] = useState(null);
+    const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const handleResize = () => setWidth(window.innerWidth);
-    handleResize(); // set initial width
+      const handleResize = () => setIsMobile(window.innerWidth <= 600);
+      handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  if (width === null) return null;
-  const isMobile = width <= 600;
-
-  // Determine horizontal padding: none on desktop, minimal on mobile
-  const containerPadding = isMobile ? '0 8px' : '0';
 
   return (
     <section
       style={{
         width: '100%',
-        padding: isMobile ? '48px 0 36px' : '72px 0 56px',
-        backgroundColor: 'rgba(126,82,24,0.61)',
-        boxSizing: 'border-box',            // include padding in width calculations
-        overflowX: 'hidden',               // prevent any horizontal scroll
+          padding: isMobile ? '48px 1rem 36px' : '72px 3rem 56px',
+          backgroundImage: `linear-gradient(rgba(30,26,23,0.92), rgba(30,26,23,0.92)), url('/images/background.webp')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center top',
+          backgroundRepeat: 'no-repeat',
+          boxSizing: 'border-box',
+          overflowX: 'hidden',
       }}
     >
       <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '48px' }}>
@@ -93,10 +85,10 @@ export default function TeamSection() {
           style={{
             fontFamily: 'Sancreek, cursive',
             fontSize: isMobile ? '32px' : '48px',
-            color: '#1c1f1a',
+              color: '#e4938a',
             textTransform: 'uppercase',
             letterSpacing: '1px',
-            marginBottom: '8px',
+              marginBottom: '12px',
           }}
         >
           Meet Our Team
@@ -105,9 +97,11 @@ export default function TeamSection() {
           style={{
             fontFamily: 'Lora, serif',
             fontSize: '16px',
-            color: '#ffffff',
+              color: '#EDEAE2',
             margin: 0,
-            lineHeight: 1.4,
+              lineHeight: 1.5,
+              maxWidth: '600px',
+              marginInline: 'auto',
           }}
         >
           Artists with passion, precision, and personality. Click their cards to view their work.
@@ -120,8 +114,6 @@ export default function TeamSection() {
           flexWrap: 'wrap',
           justifyContent: 'center',
           gap: '24px',
-          padding: containerPadding,        // apply dynamic padding
-          boxSizing: 'border-box',          // ensure padding doesn't overflow
         }}
       >
         {artists.map((artist) => (
@@ -131,11 +123,11 @@ export default function TeamSection() {
             style={{ textDecoration: 'none', width: '100%', maxWidth: '320px' }}
           >
             <motion.div
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: 'spring', stiffness: 180, damping: 18 }}
+                whileHover={{scale: 1.03}}
+                transition={{type: 'spring', stiffness: 200, damping: 18}}
               style={cardStyle}
             >
-              {width > 600 && (
+                {!isMobile && (
                 <div style={imageContainerStyle}>
                   <Image
                     src={artist.image}
@@ -170,24 +162,21 @@ export default function TeamSection() {
   );
 }
 
-// Shared card styling
 const cardStyle = {
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   padding: '16px',
   borderRadius: '16px',
-  background: 'rgb(28,31,26)',
-  backdropFilter: 'blur(12px)',
-  WebkitBackdropFilter: 'blur(12px)',
+    background: 'rgba(28,31,26,0.95)',
   border: '1px solid rgba(255,255,255,0.08)',
   boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
   cursor: 'pointer',
-  perspective: '1000px',
-  boxSizing: 'border-box',            // include padding & border
+    boxSizing: 'border-box',
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
 };
 
-// Shared image container styling
 const imageContainerStyle = {
   position: 'relative',
   width: '100%',

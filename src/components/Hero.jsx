@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import {useEffect, useState} from 'react';
+import {motion} from 'framer-motion';
 
 export default function Hero() {
   const [mounted, setMounted] = useState(false);
@@ -12,24 +12,22 @@ export default function Hero() {
     seconds: '00',
   });
 
-  const calculateTimeLeft = () => {
-    const diff = +new Date('2025-07-26T12:00:00') - Date.now();
-    if (diff <= 0) {
-      return { days: '00', hours: '00', minutes: '00', seconds: '00' };
-    }
-    const fmt = (n) => String(n).padStart(2, '0');
-    return {
-      days: fmt(Math.floor(diff / 1000 / 60 / 60 / 24)),
-      hours: fmt(Math.floor((diff / 1000 / 60 / 60) % 24)),
-      minutes: fmt(Math.floor((diff / 1000 / 60) % 60)),
-      seconds: fmt(Math.floor((diff / 1000) % 60)),
-    };
-  };
-
-  useEffect(() => {
-    setMounted(true);
-    const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
+    useEffect(() => {
+        setMounted(true);
+        const timer = setInterval(() => {
+            const diff = +new Date('2025-07-26T12:00:00') - Date.now();
+            if (diff <= 0) {
+                setTimeLeft({days: '00', hours: '00', minutes: '00', seconds: '00'});
+                clearInterval(timer);
+                return;
+            }
+            const fmt = (n) => String(n).padStart(2, '0');
+            setTimeLeft({
+                days: fmt(Math.floor(diff / 1000 / 60 / 60 / 24)),
+                hours: fmt(Math.floor((diff / 1000 / 60 / 60) % 24)),
+                minutes: fmt(Math.floor((diff / 1000 / 60) % 60)),
+                seconds: fmt(Math.floor((diff / 1000) % 60)),
+            });
     }, 1000);
     return () => clearInterval(timer);
   }, []);
@@ -44,8 +42,9 @@ export default function Hero() {
         justifyContent: 'center',
         position: 'relative',
         overflow: 'hidden',
+          padding: '2rem 1.25rem',
         backgroundImage:
-            'linear-gradient(rgba(44,32,22,0.9), rgba(44,32,22,0.9)), url("/images/background.webp")',
+            "linear-gradient(rgba(30,26,23,0.92), rgba(30,26,23,0.92)), url('/images/background.webp')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
@@ -53,16 +52,16 @@ export default function Hero() {
     >
       <div
         style={{
-          background: '#2C2016D9',
-          padding: 32,
-          borderRadius: 16,
+            backgroundColor: 'rgba(44,32,22,0.85)',
+            padding: '2.5rem',
+            borderRadius: '16px',
           textAlign: 'center',
-          maxWidth: 600,
+            maxWidth: '600px',
           width: '100%',
         }}
       >
         <motion.h1
-          initial={{ opacity: 0, y: 24 }}
+            initial={{opacity: 0, y: 20}}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           style={{
@@ -70,7 +69,7 @@ export default function Hero() {
             fontFamily: 'Sancreek, cursive',
             color: '#e4938a',
             textTransform: 'uppercase',
-            letterSpacing: '2px',
+              letterSpacing: '1.5px',
             marginBottom: '0.75rem',
           }}
         >
@@ -78,11 +77,11 @@ export default function Hero() {
         </motion.h1>
 
         <motion.p
-          initial={{ opacity: 0, y: 24 }}
+            initial={{opacity: 0, y: 20}}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
           style={{
-            fontSize: '1.1rem',
+              fontSize: '1.125rem',
             fontFamily: 'Lora, serif',
             color: '#f1ede0',
             marginBottom: '1.5rem',
@@ -92,7 +91,7 @@ export default function Hero() {
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+            initial={{opacity: 0, y: 20}}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
           style={{
@@ -100,8 +99,8 @@ export default function Hero() {
             justifyContent: 'space-around',
             padding: '16px 0',
             backgroundColor: 'rgba(255, 255, 255, 0.05)',
-            borderRadius: 12,
-            marginBottom: 24,
+              borderRadius: '12px',
+              marginBottom: '1.5rem',
           }}
         >
           {['days', 'hours', 'minutes', 'seconds'].map((unit) => (
@@ -112,7 +111,13 @@ export default function Hero() {
               >
                 {mounted ? timeLeft[unit] : '00'}
               </div>
-              <div style={{ fontSize: '0.75rem', textTransform: 'uppercase' }}>
+                <div
+                    style={{
+                        fontSize: '0.75rem',
+                        textTransform: 'uppercase',
+                        opacity: 0.8,
+                    }}
+                >
                 {unit}
               </div>
             </div>
@@ -127,11 +132,11 @@ export default function Hero() {
             fontFamily: 'Lora, serif',
             fontWeight: 'bold',
             padding: '12px 24px',
-            borderRadius: 8,
+              borderRadius: '8px',
             textDecoration: 'none',
             fontSize: '1rem',
             display: 'inline-block',
-            marginBottom: '1.5rem',
+              marginBottom: '1.25rem',
           }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -140,21 +145,37 @@ export default function Hero() {
         </motion.a>
 
         <motion.p
-          initial={{ opacity: 0, y: 24 }}
+            initial={{opacity: 0, y: 20}}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
           style={{
-            fontSize: '0.9rem',
+              fontSize: '0.95rem',
             fontFamily: 'Lora, serif',
             color: '#f1ede0',
-            marginTop: '1.25rem',
           }}
         >
-          430 N Dobson Rd #109 Mesa, AZ
-          <br />
+            430 N Dobson Rd #109 Mesa, AZ<br/>
           Hosted by @greensparrowtattoo.co
         </motion.p>
       </div>
+
+        <motion.div
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            transition={{delay: 0.65}}
+            style={{
+                position: 'absolute',
+                bottom: 24,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                fontFamily: 'Lora, serif',
+                fontSize: '0.95rem',
+                color: '#f1ede0',
+                opacity: 0.85,
+            }}
+        >
+            Scroll Down ↓
+        </motion.div>
     </section>
   );
 }

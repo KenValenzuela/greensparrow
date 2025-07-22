@@ -7,13 +7,13 @@ export default function Footer() {
     <footer className="footer" aria-labelledby="footer-heading">
       <h2 id="footer-heading" className="sr-only">Footer</h2>
       <div className="footer-container">
-        {/* LEFT COLUMN: Navigation */}
+        {/* LEFT COLUMN */}
         <nav className="footer-nav" aria-label="Footer navigation">
           {[
             ['/gallery', 'Our Work'],
-            ['/about',   'About Us'],
-            ['/booking','Book Now'],
-            ['/faq',    'FAQ'],
+            ['/about', 'About Us'],
+            ['/booking', 'Book Now'],
+            ['/faq', 'FAQ'],
           ].map(([href, label]) => (
             <Link key={href} href={href}>
               {label}
@@ -21,42 +21,30 @@ export default function Footer() {
           ))}
         </nav>
 
-        {/* CENTER COLUMN: Logo and CTA */}
+        {/* CENTER COLUMN */}
         <div className="footer-center">
           <p className="footer-logo-text">Green Sparrow Tattoo Co.</p>
           <p className="footer-cta">
-            Ready to book your next piece?{' '}
-            <Link href="/booking" className="cta-button">
-              Book Now! →
-            </Link>
+            Ready to book your next piece?
+            <br/>
+            <Link href="/booking" className="cta-button">Book Now →</Link>
           </p>
         </div>
 
-        {/* RIGHT COLUMN: Socials & Address */}
+        {/* RIGHT COLUMN */}
         <div className="footer-right">
           <div className="footer-socials" aria-label="Social media links">
-            <Link
-              href="https://instagram.com/greensparrowtattoo.co"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Instagram
-            </Link>
-            <Link
-              href="https://facebook.com/Green-Sparrow-Tattoo-Co"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Facebook
-            </Link>
-            <Link
-              href="https://tiktok.com/@greensparrowtattooco"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              TikTok
-            </Link>
+            {[
+              ['https://instagram.com/greensparrowtattoo.co', 'Instagram'],
+              ['https://facebook.com/Green-Sparrow-Tattoo-Co', 'Facebook'],
+              ['https://tiktok.com/@greensparrowtattooco', 'TikTok'],
+            ].map(([href, label]) => (
+                <Link key={label} href={href} target="_blank" rel="noopener noreferrer">
+                  {label}
+                </Link>
+            ))}
           </div>
+
           <address className="footer-address">
             430 N. Dobson Rd<br />
             Unit 109<br />
@@ -75,12 +63,9 @@ export default function Footer() {
 
       <style jsx>{`
         .footer {
-          background: linear-gradient(
-              rgba(44, 32, 22, 0.85),
-              rgba(44, 32, 22, 0.85)
-            ),
-            url('/images/background.webp') center/cover no-repeat;
-          color: #fff;
+          background: linear-gradient(rgba(44, 32, 22, 0.85), rgba(44, 32, 22, 0.85)),
+          url('/images/background.webp') center/cover no-repeat;
+          color: #e4938a;
           border-top: 2px solid #687357;
         }
 
@@ -88,9 +73,9 @@ export default function Footer() {
           display: grid;
           grid-template-columns: 1fr auto 1fr;
           grid-template-areas: "nav center right";
-          align-items: start;
           padding: 2.5rem 3rem;
           gap: 2rem;
+          align-items: start;
         }
 
         .footer-nav {
@@ -105,6 +90,11 @@ export default function Footer() {
         .footer-nav a {
           color: #fff;
           text-decoration: none;
+          transition: color 0.2s ease;
+        }
+
+        .footer-nav a:hover {
+          color: #e5948b;
         }
 
         .footer-center {
@@ -125,16 +115,16 @@ export default function Footer() {
         }
 
         .cta-button {
+          display: inline-block;
+          margin-top: 0.5rem;
           font-family: 'Sancreek', cursive;
           font-size: 1.75rem;
           color: #fff;
           text-decoration: none;
-          margin-left: 0.5rem;
           transition: transform 0.2s ease;
         }
 
-        .cta-button:hover,
-        .cta-button:focus {
+        .cta-button:hover {
           transform: translateX(4px);
         }
 
@@ -158,6 +148,10 @@ export default function Footer() {
           text-decoration: none;
         }
 
+        .footer-socials a:hover {
+          color: #e5948b;
+        }
+
         .footer-address {
           font-family: 'Lora', serif;
           font-size: 0.95rem;
@@ -170,11 +164,11 @@ export default function Footer() {
           text-decoration: none;
         }
 
-        /* MOBILE (≤640px) */
+        /* Mobile Responsive */
         @media (max-width: 640px) {
           .footer-container {
-            display: flex;
             flex-direction: column;
+            display: flex;
             align-items: center;
             text-align: center;
             padding: 2rem 1rem;
@@ -197,13 +191,10 @@ export default function Footer() {
           }
 
           .cta-button {
-            display: block;
-            margin: 0.5rem auto 0;
             font-size: 1.5rem;
           }
         }
 
-        /* Screen-reader only */
         .sr-only {
           position: absolute;
           width: 1px;
