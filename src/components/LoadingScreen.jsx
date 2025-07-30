@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import {useEffect, useState} from 'react';
+import {usePathname} from 'next/navigation';
+import {AnimatePresence, motion} from 'framer-motion';
 import useTypewriter from '@/hooks/useTypewriter';
 
 const loadingImages = [
@@ -105,8 +105,7 @@ export default function LoadingScreen({ children }) {
               position: 'fixed',
               inset: 0,
               zIndex: 50,
-              backgroundImage:
-                  "linear-gradient(rgba(44,32,22,0.85), rgba(44,32,22,0.85)), url('/images/background.webp')",
+
               backgroundSize: 'cover',
               backgroundRepeat: 'repeat',
               backgroundPosition: 'center top',
