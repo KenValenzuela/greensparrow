@@ -1,4 +1,3 @@
-// 100 % expanded – overwrite the file
 import Script from 'next/script';
 import 'src/styles/globals.css';
 
@@ -13,7 +12,7 @@ import {SpeedInsights} from '@vercel/speed-insights/next';
 
 export const metadata = {
   title: 'Green Sparrow Tattoo',
-  description: 'Experience tattoo artistry and visual storytelling'
+  description: 'Experience tattoo artistry and visual storytelling',
 };
 
 export default function RootLayout({ children }) {
@@ -23,22 +22,24 @@ export default function RootLayout({ children }) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-        {/* Fonts */}
+        {/* Google Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
             href="https://fonts.googleapis.com/css2?family=Sancreek&family=Lora:ital,wght@0,400;0,700;1,400&display=swap"
-            rel="stylesheet"/>
+            rel="stylesheet"
+        />
       </head>
 
-      <body className="bg-background text-foreground antialiased font-display">
-      {/* Google Maps SDK */}
+      {/* `site-bg` gives every page the new fixed backdrop */}
+      <body className="site-bg bg-background text-foreground antialiased font-display">
+      {/* Google Maps SDK */}
         <Script
           src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
           strategy="afterInteractive"
         />
 
-      {/* ⚠️  NO jQuery / turn.js <script> tags here – they come from npm */}
+      {/* Main application wrapper */}
         <LoadingScreen>
           <LenisProvider>
             <AOSWrapper>

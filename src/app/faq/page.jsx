@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import {useEffect, useState} from 'react';
+import {AnimatePresence, motion} from 'framer-motion';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
@@ -201,20 +201,14 @@ export default function FAQPage() {
 }
 
 const styles = {
-  wrapper: {
-      backgroundImage: "url('/images/background.webp')",
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    minHeight: '100vh',
-    position: 'relative',
-  },
+
   overlay: {
     position: 'absolute',
     top: 0,
     left: 0,
     width: '100%',
     height: '100%',
-    background: 'rgba(10,10,10,0.85)',
+
     zIndex: 0,
   },
   page: {

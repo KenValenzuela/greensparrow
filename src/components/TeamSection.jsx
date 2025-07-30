@@ -72,7 +72,6 @@ export default function TeamSection() {
       style={{
         width: '100%',
           padding: isMobile ? '48px 1rem 36px' : '72px 3rem 56px',
-          backgroundImage: `linear-gradient(rgba(30,26,23,0.92), rgba(30,26,23,0.92)), url('/images/background.webp')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center top',
           backgroundRepeat: 'no-repeat',

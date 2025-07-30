@@ -8,6 +8,7 @@ export default function ArtistsPage() {
 
       <div style={{ width: '100%' }}>
         <TeamSection />
+
       </div>
     </main>
   );

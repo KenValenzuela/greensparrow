@@ -1,5 +1,3 @@
-import Footer from '@/components/Footer.jsx';
-
 export const metadata = {
   title: 'About – Green Sparrow Tattoo Co.',
   description: 'Meet the founder and story behind our Mesa tattoo studio.',
@@ -10,9 +8,8 @@ export default function AboutPage() {
     <>
       <main
         style={{
-          backgroundImage:
-              "linear-gradient(rgba(30, 26, 23, 0.94), rgba(30, 26, 23, 0.94)), url('/images/background.webp')",
-          backgroundSize: 'cover',
+
+            backgroundSize: 'cover',
           backgroundRepeat: 'repeat',
           backgroundPosition: 'center top',
           color: '#F1EDE0',

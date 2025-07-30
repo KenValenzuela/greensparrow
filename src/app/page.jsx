@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect } from 'react'
+import {useEffect} from 'react'
 // FID has been replaced by INP in web-vitals; remove onFID and import onINP instead
-import { onCLS, onLCP, onINP } from 'web-vitals'
+import {onCLS, onINP, onLCP} from 'web-vitals'
 import dynamic from 'next/dynamic'
 import AboutSection from '@/components/AboutSection'
-import Hero from '@/components/Hero'
+
 const TeamSection = dynamic(() => import('@/components/TeamSection'), { ssr: false })
 const Testimonials = dynamic(() => import('@/components/Testimonials'), { ssr: false })
 
@@ -30,8 +30,8 @@ export default function HomePage() {
   return (
     <main>
 
-      <Hero />
-      <AboutSection />
+
+    <AboutSection />
 
       <TeamSection />
 

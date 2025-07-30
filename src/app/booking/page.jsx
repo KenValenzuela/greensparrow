@@ -10,9 +10,8 @@ export default function BookingPage() {
     <main
       className="booking-main"
       style={{
-        backgroundImage:
-          "linear-gradient(rgba(30, 26, 23, 0.92), rgba(30, 26, 23, 0.92)), url('/images/background.png')",
-        backgroundSize: 'cover',
+
+          backgroundSize: 'cover',
         backgroundRepeat: 'repeat',
         backgroundPosition: 'center top',
         backgroundAttachment: 'scroll',

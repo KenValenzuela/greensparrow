@@ -313,7 +313,7 @@ const styles = {
   main: {
     padding: '3rem .8rem',
     minHeight: '100vh',
-    background: `${palette.brown} url('/images/background.webp') center/cover`,
+
     color: palette.cream,
     fontFamily: 'Lora,serif',
     textAlign: 'center',

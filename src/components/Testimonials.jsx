@@ -5,38 +5,39 @@ import {AnimatePresence, motion} from 'framer-motion';
 
 const reviews = [
   {
-    author: 'E M',
-    text: "Ki is so talented! She freehanded two of my tattoos (large and detailed!) straight from her brain and I get complimented on them everywhere I go! She does a great job, has amazing skills, is knowledgeable, super clean and sanitary, and has great energy!! 10/10 recommend :)!",
+      author: 'E M',
+      text: 'Ki is so talented! She free‑handed two of my tattoos (large and detailed!) straight from her brain and I get complimented on them everywhere I go! She does a great job, has amazing skills, is knowledgeable, super clean and sanitary, and has great energy!! 10/10 recommend :)',
       photos: ['/images/reviews/em-2.webp', '/images/reviews/em-1.webp'],
   },
   {
-    author: 'Cinthya Tizoc',
-    text: "My tattoo artist did a great job. She was transparent about the price and even went out of her ways to make my designs even more beautiful. She provided me with many design options. Overall it was an amazing experience. I highly recommend this tattoo shop. Great vibes.",
+      author: 'Cinthya Tizoc',
+      text: 'My tattoo artist did a great job. She was transparent about the price and even went out of her way to make my designs even more beautiful. She provided many design options. Overall an amazing experience—highly recommend this shop. Great vibes.',
     photos: [],
   },
-  // Add more reviews as needed
+    // add more as needed
 ];
 
 export default function Testimonials() {
   const [index, setIndex] = useState(0);
-  const [displayedText, setDisplayedText] = useState('');
+    const [displayed, setDisplayed] = useState('');
   const [typingDone, setTypingDone] = useState(false);
-  const charIndexRef = useRef(0);
+    const charRef = useRef(0);
   const intervalRef = useRef(null);
-  const currentReview = reviews[index] ?? {}; // prevent undefined errors
+    const current = reviews[index];
 
+    /* typewriter effect */
   useEffect(() => {
-    if (!currentReview?.text) return;
-    setDisplayedText('');
+      if (!current.text) return;
+      setDisplayed('');
     setTypingDone(false);
-    charIndexRef.current = 0;
+      charRef.current = 0;
     clearInterval(intervalRef.current);
 
     intervalRef.current = setInterval(() => {
-      const nextChar = currentReview.text[charIndexRef.current];
-      if (nextChar) {
-        setDisplayedText((prev) => prev + nextChar);
-        charIndexRef.current += 1;
+        const next = current.text[charRef.current];
+        if (next) {
+            setDisplayed(prev => prev + next);
+            charRef.current += 1;
       } else {
         clearInterval(intervalRef.current);
         setTypingDone(true);
@@ -46,20 +47,25 @@ export default function Testimonials() {
     return () => clearInterval(intervalRef.current);
   }, [index]);
 
+    /* auto‑advance after typing finishes */
   useEffect(() => {
     if (!typingDone) return;
-    const timer = setTimeout(() => {
-      setIndex((prev) => (prev + 1) % reviews.length);
-    }, 2500);
-    return () => clearTimeout(timer);
+      const t = setTimeout(
+          () => setIndex(prev => (prev + 1) % reviews.length),
+          2500,
+      );
+      return () => clearTimeout(t);
   }, [typingDone]);
 
   return (
     <section
+        id="testimonials"
+        className="about-section"            /* same class as AboutSection */
       style={{
-          backgroundImage: "linear-gradient(rgba(30,26,23,0.92), rgba(30,26,23,0.92)), url('/images/background.webp')",
+          /* same inline background controls */
         backgroundSize: 'cover',
-        backgroundPosition: 'center',
+          backgroundPosition: 'center top',
+          backgroundRepeat: 'no-repeat',
         padding: '5rem 1.5rem',
         boxSizing: 'border-box',
         position: 'relative',
@@ -82,23 +88,23 @@ export default function Testimonials() {
 
       <div
         style={{
-  maxWidth: '768px',
-  margin: '0 auto',
-  textAlign: 'center',
-  background: 'rgba(25, 35, 30, 0.55)', // semi-transparent dark
-  backdropFilter: 'blur(10px)',         // glass blur
-  WebkitBackdropFilter: 'blur(10px)',   // Safari support
-  border: '1px solid rgba(255, 255, 255, 0.1)',
-  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.25)',
-  padding: '2rem',
-  borderRadius: '12px',
-  minHeight: '340px',
-  maxHeight: '400px',
-  overflow: 'hidden',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-}}
+            maxWidth: '768px',
+            margin: '0 auto',
+            textAlign: 'center',
+
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
+            padding: '2rem',
+            borderRadius: '12px',
+            minHeight: '340px',
+            maxHeight: '400px',
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+        }}
       >
         <AnimatePresence mode="wait">
           <motion.div
@@ -113,18 +119,17 @@ export default function Testimonials() {
               style={{
                 fontSize: '1.125rem',
                 lineHeight: '1.75rem',
-                fontWeight: '300',
+                  fontWeight: 300,
                 color: '#dadada',
                 marginBottom: '0.75rem',
-                maxWidth: '100%',
               }}
             >
-              “{displayedText}
+                “{displayed}
               <span
                 style={{
                   display: 'inline-block',
                   width: '1ch',
-                  animation: 'blink 1s steps(2, start) infinite',
+                    animation: 'blink 1s steps(2,start) infinite',
                 }}
               >
                 |
@@ -134,28 +139,29 @@ export default function Testimonials() {
             <p
               style={{
                 fontSize: '1rem',
-                fontWeight: '600',
+                  fontWeight: 600,
                 color: '#dadada',
                 marginBottom: '1.5rem',
               }}
             >
-              – {currentReview?.author || ''}
+                – {current.author}
             </p>
 
-            {currentReview?.photos?.length > 0 && (
+              {current.photos.length > 0 && (
               <div
                 style={{
                   display: 'flex',
                   flexWrap: 'wrap',
                   justifyContent: 'center',
                   gap: '1rem',
+                    marginTop: '1rem',
                 }}
               >
-                {currentReview.photos.map((src, i) => (
+                  {current.photos.map((src, i) => (
                   <img
                     key={i}
                     src={src}
-                    alt={`Review photo ${i + 1}`}
+                    alt={`Review ${i + 1}`}
                     style={{
                       maxWidth: '120px',
                       height: '120px',
@@ -174,14 +180,11 @@ export default function Testimonials() {
       <style>
         {`
           @keyframes blink {
-            0%, 100% { opacity: 1; }
+            0%,100% { opacity: 1; }
             50% { opacity: 0; }
           }
-
           @media (max-width: 600px) {
-            img {
-              max-width: 100px !important;
-            }
+            img { max-width: 100px !important; }
           }
         `}
       </style>

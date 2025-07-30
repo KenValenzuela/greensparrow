@@ -1,8 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination } from 'swiper/modules';
+import {Swiper, SwiperSlide} from 'swiper/react';
+import {Autoplay, Pagination} from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
@@ -29,10 +29,9 @@ export default function AboutSection({ variant = 'preview' }) {
         gap: '2rem',
         padding: isPreview ? '4rem 1.5rem' : '6rem 1.5rem',
         color: '#F1EDE0',
-          backgroundImage: `linear-gradient(rgba(30,26,23,0.92), rgba(30,26,23,0.92)), url('/images/background.webp')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center top',
-        backgroundRepeat: 'no-repeat',
+          backgroundRepeat: 'repeat',
       }}
     >
       {/* Image Carousel */}
