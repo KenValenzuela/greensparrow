@@ -1,283 +1,239 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import {useEffect, useState} from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { FiPhone } from 'react-icons/fi';
+import {FiMenu, FiPhone, FiX} from 'react-icons/fi';
+import {usePathname} from 'next/navigation';
 
-export default function Navbar({ show = true }) {
-  const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+const LINKS = [
+  ['/about', 'About'],
+  ['/artists', 'Artists'],
+  ['/gallery', 'Gallery'],
+  ['/faq', 'FAQ'],
+];
+
+export default function Navbar() {
   const pathname = usePathname();
+  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  const navItems = [
-    ['/about', 'About'],
-    ['/artists', 'Artists'],
-    ['/gallery', 'Gallery'],
-    ['/booking', 'Booking'],
-    ['/faq', 'FAQ'],
-  ];
-
-  // add/remove scrolled state based on window scroll
+  /* sticky shadow */
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 30);
-    window.addEventListener('scroll', onScroll);
+    const onScroll = () => setScrolled(window.scrollY > 90);
+    window.addEventListener('scroll', onScroll, {passive: true});
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // close mobile menu when route changes
+  /* lock body scroll on menu open */
   useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
-
-  const linkStyle = (href) => ({
-    color: pathname === href ? '#e5948b' : '#F1EDE0',
-    fontSize: '16px',
-    fontFamily: '"Cormorant Garamond", serif',
-    fontWeight: 600,
-    textTransform: 'uppercase',
-    padding: '0.75em 1em',
-    textAlign: 'center',
-    position: 'relative',
-    transition: 'color 0.3s ease',
-    whiteSpace: 'nowrap',
-  });
-
-  if (!show) return null;
+    document.body.style.overflow = open ? 'hidden' : '';
+  }, [open]);
 
   return (
     <>
-      <header className="navbar">
-        <div className="container">
-          {/* Left side desktop links */}
-          <nav className="desktop-nav left">
-            {navItems.slice(0, 2).map(([href, label]) => (
-              <Link key={href} href={href}>
-                <span style={linkStyle(href)} className="hover-underline">
+      <header className={`nav ${scrolled ? 'shadow' : ''}`}>
+        <div className="inner">
+          {/* left links */}
+          <nav className="d-menu">
+            {LINKS.slice(0, 2).map(([href, label]) => (
+                <Link key={href} href={href} className={pathname === href ? 'active' : ''}>
                   {label}
-                </span>
               </Link>
             ))}
           </nav>
 
-          {/* Logo and Home */}
-          <div className="logo-block">
-            <Link href="/" style={{ zIndex: 2 }}>
+          {/* logo */}
+          <div className="logo">
+            <Link href="/" aria-label="Home">
               <img
                   src="/images/green-sparrow-transparent.webp"
-                alt="Green Sparrow Tattoo Co."
-                className="logo-img"
-                style={{
-                  objectFit: 'contain',
-                  height: scrolled ? '80px' : '100px',
-                  transition: 'all 0.3s ease',
-                  filter: 'drop-shadow(1px 1px 3px rgba(0,0,0,0.6))',
-                }}
+                  alt="Green Sparrow Tattoo Co."
               />
-            </Link>
-            <Link href="/">
-              <span
-                style={{
-                  ...linkStyle('/'),
-                  fontSize: '14px',
-                  marginTop: '-0.5rem',
-                  display: 'block',
-                }}
-              >
-                Home
-              </span>
             </Link>
           </div>
 
-          {/* Right side desktop links */}
-          <nav className="desktop-nav right">
-            {navItems.slice(2).map(([href, label]) => (
-              <Link key={href} href={href}>
-                <span style={linkStyle(href)} className="hover-underline">
+          {/* right links + CTA */}
+          <nav className="d-menu right">
+            {LINKS.slice(2).map(([href, label]) => (
+                <Link key={href} href={href} className={pathname === href ? 'active' : ''}>
                   {label}
-                </span>
               </Link>
             ))}
+            <Link href="/booking" className="cta">Book Now</Link>
           </nav>
 
-          {/* Mobile icons: phone (hidden) + hamburger */}
-          <div className="mobile-icons">
-            <a
-              href="tel:+16022093099"
-              aria-label="Call us"
-              className="phone-icon"
-              style={{ padding: 8 }}
-            >
-              <FiPhone size={24} color="#F1EDE0" />
+          {/* mobile buttons */}
+          <div className="m-actions">
+            <a href="tel:+16022093099" aria-label="Call us">
+              <FiPhone size={26}/>
             </a>
             <button
-              onClick={() => setOpen(!open)}
+                className="burger"
               aria-label="Toggle menu"
-              aria-expanded={open}
-              className="hamburger"
+                onClick={() => setOpen(o => !o)}
             >
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="bar" />
-              ))}
+              {open ? <FiX size={30}/> : <FiMenu size={30}/>}
             </button>
           </div>
         </div>
 
-        {/* Mobile menu: absolute full-width dropdown */}
-        <div className={`hamburger-menu ${open ? 'show' : ''}`}>
-          {navItems.map(([href, label]) => (
-            <Link key={href} href={href} onClick={() => setOpen(false)}>
-              <span className="mobile-link">{label}</span>
+        {/* mobile drawer */}
+        <nav className={`m-drawer ${open ? 'show' : ''}`}>
+          {[...LINKS, ['/booking', 'Book Now']].map(([href, label]) => (
+              <Link
+                  key={href}
+                  href={href}
+                  onClick={() => setOpen(false)}
+                  className={pathname === href ? 'active' : ''}
+              >
+                {label}
             </Link>
           ))}
-        </div>
+        </nav>
       </header>
 
       <style jsx>{`
-        .navbar {
+        :global(body) {
+          margin: 0;
+        }
+
+        /* NAV BAR */
+        .nav {
           position: sticky;
           top: 0;
-          z-index: 999;
+          left: 0;
+          right: 0;
+          z-index: 1000;
+          height: 118px; /* taller bar */
+          background: #1b1b1b;
+          color: #f1ede0;
+          display: flex;
+          align-items: center;
           width: 100%;
-          /* allow absolute children to align to full width */
-          position: relative;
-          background-image: linear-gradient(
-              rgba(44, 32, 22, 0.85),
-              rgba(44, 32, 22, 0.85)
-            ),
-            url('/images/background.webp');
-          background-size: cover;
-          background-repeat: repeat-x;
-          border-top: 2px solid #687357;
-          border-bottom: 2px solid #687357;
-          backdrop-filter: blur(6px);
         }
 
-        .container {
-          display: grid;
-          grid-template-columns: 1fr auto 1fr;
-          align-items: center;
-          max-width: 1200px;
+        .shadow {
+          box-shadow: 0 3px 8px rgba(0, 0, 0, .35);
+        }
+
+        .inner {
+          max-width: 1400px;
           margin: 0 auto;
-          padding: 0 1.5rem;
-        }
-
-        .desktop-nav {
+          padding: 0 1.25rem;
+          flex: 1;
           display: flex;
-          gap: 1.5em;
-          justify-content: center;
-          flex-wrap: wrap;
-        }
-
-        .logo-block {
-          display: flex;
-          flex-direction: column;
           align-items: center;
-          text-align: center;
+          justify-content: space-between;
         }
 
-        .hover-underline::after {
+        /* DESKTOP LINKS */
+        .d-menu {
+          display: flex;
+          gap: 2rem;
+        }
+
+        .d-menu.right {
+          align-items: center;
+        }
+
+        .d-menu a,
+        .d-menu a:visited {
+          font-family: 'Lora', serif;
+          text-transform: uppercase;
+          font-size: 17px; /* larger text */
+          color: #f1ede0;
+          text-decoration: none;
+          position: relative;
+          padding: 6px 0;
+        }
+
+        .d-menu a::after {
           content: '';
           position: absolute;
-          bottom: 4px;
           left: 0;
+          bottom: -5px;
           width: 100%;
-          height: 1px;
-          background-color: #e5948b;
+          height: 2px;
+          background: #e5948b;
           transform: scaleX(0);
-          transform-origin: bottom left;
-          transition: transform 0.25s ease-in-out;
+          transition: transform .25s;
         }
 
-        .hover-underline:hover::after {
+        .d-menu a:hover::after,
+        .d-menu a.active::after {
           transform: scaleX(1);
         }
 
-        .mobile-icons {
-          display: none;
-          align-items: center;
-          gap: 0.5rem;
+        /* CALL‑TO‑ACTION */
+        .cta,
+        .cta:visited {
+          background: #e5948b;
+          color: #1b1b1b;
+          padding: .65rem 1.6rem; /* bolder button */
+          border-radius: 4px;
+          font-family: 'Sancreek', cursive;
+          font-size: 1.15rem;
+          text-decoration: none;
         }
 
-        .hamburger {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
+        /* LOGO */
+        .logo img {
+          height: 102px; /* bigger logo */
+          transition: transform .25s;
+        }
+
+        .shadow .logo img {
+          transform: scale(.88);
+        }
+
+        /* subtle shrink */
+
+        /* MOBILE */
+        .m-actions {
+          display: none;
           align-items: center;
-          gap: 5px;
-          width: 36px;
-          height: 36px;
+          gap: 1.2rem;
+        }
+
+        .burger {
           background: none;
-          border: none;
+          border: 0;
+          color: #f1ede0;
           cursor: pointer;
         }
 
-        .bar {
-          width: 24px;
-          height: 3px;
-          background-color: #f1ede0;
-        }
-
-        /* full-width, absolute-positioned mobile menu */
-        .hamburger-menu {
-          position: absolute;
-          top: 100%;
+        .m-drawer {
+          position: fixed;
+          top: 118px;
           left: 0;
           right: 0;
+          background: #0e0e0e;
           display: none;
           flex-direction: column;
           align-items: center;
-          background: #2c2016;
-          padding: 1em 0;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          padding: 2rem 0;
+          gap: 1.4rem;
         }
 
-        .hamburger-menu.show {
+        .m-drawer.show {
           display: flex;
         }
 
-        .mobile-link {
-          color: #ede7d9;
-          font-size: 18px;
-          font-family: 'Cormorant Garamond', serif;
-          font-weight: 600;
-          text-transform: uppercase;
-          padding: 0.75em 1.5em;
+        .m-drawer a,
+        .m-drawer a:visited {
+          color: #fff;
+          font-family: 'Sancreek', cursive;
+          font-size: 1.7rem;
           text-decoration: none;
-          width: 100%;
-          max-width: 400px; /* prevent over-stretch on larger phones */
-          text-align: center;
-          box-sizing: border-box;
         }
 
-        @media (max-width: 767px) {
-          .desktop-nav {
+        @media (max-width: 900px) {
+          .d-menu {
             display: none;
           }
 
-          .container {
+          .m-actions {
             display: flex;
-            justify-content: space-between;
-            max-width: 100%;
-            padding: 0 0.005rem; /* reduced padding so menu aligns flush */
-          }
-
-          .logo-img {
-            display: none;
-          }
-
-          .mobile-icons {
-            display: flex;
-          }
-
-          .mobile-icons .phone-icon {
-            display: none;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .logo-img {
-            max-height: 60px;
           }
         }
       `}</style>

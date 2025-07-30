@@ -53,7 +53,6 @@ export default function AboutSection({ variant = 'preview' }) {
             borderRadius: '8px',
             overflow: 'hidden',
             boxShadow: '0 4px 12px rgba(0,0,0,.15)',
-            perspective: '1000px',
           }}
         >
           <Swiper
@@ -63,7 +62,6 @@ export default function AboutSection({ variant = 'preview' }) {
             autoplay={{
               delay: 3500,
               disableOnInteraction: false,
-              pauseOnMouseEnter: true,
             }}
             pagination={{ clickable: true }}
             modules={[Autoplay, Pagination]}
@@ -71,34 +69,15 @@ export default function AboutSection({ variant = 'preview' }) {
           >
             {images.map((src, i) => (
               <SwiperSlide key={i}>
-                <div
-                  style={{
-                    position: 'relative',
-                    width: '100%',
-                    height: '100%',
-                    transition: 'transform 0.4s ease',
-                  }}
-                  onMouseEnter={e => {
-                    if (window.innerWidth >= 768) {
-                      e.currentTarget.style.transform = 'rotateY(12deg)';
-                    }
-                  }}
-                  onMouseLeave={e => {
-                    if (window.innerWidth >= 768) {
-                      e.currentTarget.style.transform = 'rotateY(-12deg)';
-                    }
-                  }}
-                >
                   <Image
-                    src={src}
-                    alt={`Studio photo ${i + 1}`}
-                    fill
-                    style={{ objectFit: 'cover' }}
-                    sizes="(max-width: 768px) 100vw, 520px"
-                    priority={i === 0}
-                    loading={i === 0 ? 'eager' : 'lazy'}
+                      src={src}
+                      alt={`Studio photo ${i + 1}`}
+                      fill
+                      style={{objectFit: 'cover'}}
+                      sizes="(max-width: 768px) 100vw, 520px"
+                      priority={i === 0}
+                      loading={i === 0 ? 'eager' : 'lazy'}
                   />
-                </div>
               </SwiperSlide>
             ))}
           </Swiper>
@@ -118,13 +97,16 @@ export default function AboutSection({ variant = 'preview' }) {
       >
         <h2
           style={{
-            fontFamily: 'Sancreek, serif',
-            fontSize: isPreview ? '2rem' : '2.5rem',
-            marginBottom: '1rem',
-            lineHeight: 1.2,
+              fontFamily: 'Sancreek, cursive',
+              fontSize: '2.5rem',
+              color: '#e39289',
+              textAlign: 'center',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              marginBottom: '2rem',
           }}
         >
-          Where Story&nbsp;&amp; Skin Meet
+            Where Story&nbsp;&amp;&nbsp;Skin Meet
         </h2>
 
         <p
@@ -135,7 +117,9 @@ export default function AboutSection({ variant = 'preview' }) {
             width: '100%',
           }}
         >
-          Green Sparrow Tattoo Co. is an all-inclusive, desert-rooted studio in Mesa, Arizona. We’re proud to offer a welcoming space for all identities, where each tattoo is built on connection, care, and creative storytelling.
+            Green Sparrow Tattoo Co. is an all-inclusive, desert-rooted studio in Mesa, Arizona.
+            We’re proud to offer a welcoming space for all identities, where each tattoo is
+            built on connection, care, and creative storytelling.
         </p>
 
         {!isPreview && (
@@ -148,7 +132,7 @@ export default function AboutSection({ variant = 'preview' }) {
                 width: '100%',
               }}
             >
-              From black-and-grey realism to cyber-sigilism, our team covers a broad range
+                From black‑and‑grey realism to cyber‑sigilism, our team covers a broad range
               of styles. Private rooms keep sessions relaxed, while our renovated space
               showcases local art, antique curiosities, and just the right dose of
               taxidermy charm.
@@ -160,9 +144,9 @@ export default function AboutSection({ variant = 'preview' }) {
                 width: '100%',
               }}
             >
-              We believe tattooing is collaboration. Tell us your story, share your mood
-              board, or show up with a sketch on a napkin—together we’ll design something
-              you’ll love for life.
+                Tattooing is collaboration. Tell us your story, share your mood board, or
+                show up with a sketch on a napkin—together we’ll design something you’ll
+                love for life.
             </p>
           </>
         )}
@@ -204,14 +188,12 @@ export default function AboutSection({ variant = 'preview' }) {
           }
 
           .about-text h2 {
-            font-size: 1.6rem !important;
-            line-height: 1.2 !important;
+              font-size: 1.8rem !important;
           }
 
           .about-text p {
             font-size: 0.95rem !important;
             padding: 0 0.5rem !important;
-            width: 100% !important;
             max-width: 90vw !important;
           }
 

@@ -1,200 +1,237 @@
 'use client';
 
 import Link from 'next/link';
+import {FiFacebook, FiInstagram, FiMapPin, FiPhone} from 'react-icons/fi';
 
 export default function Footer() {
   return (
     <footer className="footer" aria-labelledby="footer-heading">
-      <h2 id="footer-heading" className="sr-only">Footer</h2>
-      <div className="footer-container">
-        {/* LEFT COLUMN */}
-        <nav className="footer-nav" aria-label="Footer navigation">
+      <h2 id="footer-heading" className="sr-only">Site footer</h2>
+
+      <div className="wrap">
+        {/* LEFT */}
+        <nav className="nav" aria-label="Footer navigation">
           {[
-            ['/gallery', 'Our Work'],
-            ['/about', 'About Us'],
-            ['/booking', 'Book Now'],
+            ['/gallery', 'Our Work'],
+            ['/about', 'About Us'],
+            ['/booking', 'Book Now'],
             ['/faq', 'FAQ'],
           ].map(([href, label]) => (
-            <Link key={href} href={href}>
-              {label}
-            </Link>
+              <Link key={href} href={href}>{label}</Link>
           ))}
         </nav>
 
-        {/* CENTER COLUMN */}
-        <div className="footer-center">
-          <p className="footer-logo-text">Green Sparrow Tattoo Co.</p>
-          <p className="footer-cta">
-            Ready to book your next piece?
-            <br/>
-            <Link href="/booking" className="cta-button">Book Now →</Link>
-          </p>
+        {/* CENTER */}
+        <div className="brand">
+          <p className="logo">Green Sparrow Tattoo Co.</p>
+          <Link href="/booking" className="cta">Book Now →</Link>
+          <p className="tag">Ready to book your next piece?</p>
         </div>
 
-        {/* RIGHT COLUMN */}
-        <div className="footer-right">
-          <div className="footer-socials" aria-label="Social media links">
-            {[
-              ['https://instagram.com/greensparrowtattoo.co', 'Instagram'],
-              ['https://facebook.com/Green-Sparrow-Tattoo-Co', 'Facebook'],
-              ['https://tiktok.com/@greensparrowtattooco', 'TikTok'],
-            ].map(([href, label]) => (
-                <Link key={label} href={href} target="_blank" rel="noopener noreferrer">
-                  {label}
-                </Link>
-            ))}
+        {/* RIGHT */}
+        <div className="contact">
+          <address>
+            <FiMapPin aria-hidden/> 430 N Dobson Rd #109<br/>
+            Mesa, AZ 85201
+          </address>
+
+          <Link href="tel:+16022093099" className="phone">
+            <FiPhone aria-hidden/> (602) 209‑3099
+          </Link>
+
+          <div className="social" aria-label="Social">
+            <Link href="https://instagram.com/greensparrowtattoo.co" target="_blank" rel="noopener"
+                  aria-label="Instagram">
+              <FiInstagram size={20}/>
+            </Link>
+            <Link href="https://facebook.com/Green-Sparrow-Tattoo-Co" target="_blank" rel="noopener"
+                  aria-label="Facebook">
+              <FiFacebook size={20}/>
+            </Link>
           </div>
 
-          <address className="footer-address">
-            430 N. Dobson Rd<br />
-            Unit 109<br />
-            Mesa, AZ 85201<br />
-            <Link href="tel:+16022093099">(602) 209-3099</Link><br />
-            <Link
+          <Link
               href="https://maps.google.com/?q=Green+Sparrow+Tattoo+Co."
               target="_blank"
-              rel="noopener noreferrer"
-            >
-              Open in Maps →
-            </Link>
-          </address>
+              rel="noopener"
+              className="maps"
+          >
+            Open in Maps →
+          </Link>
         </div>
       </div>
 
+      <p className="copy">
+        © {new Date().getFullYear()} Green Sparrow Tattoo Co. All rights reserved.
+      </p>
+
       <style jsx>{`
+        :global(body) {
+          margin: 0;
+        }
+
+        /* ===== base ===== */
         .footer {
-          background: linear-gradient(rgba(44, 32, 22, 0.85), rgba(44, 32, 22, 0.85)),
-          url('/images/background.webp') center/cover no-repeat;
-          color: #e4938a;
-          border-top: 2px solid #687357;
+          background: #1b1b1b;
+          color: #255130;
+          border-top: 2px solid #255130;
+          padding: 2rem 1rem 1.75rem;
+          font-family: 'Lora', serif;
         }
 
-        .footer-container {
-          display: grid;
-          grid-template-columns: 1fr auto 1fr;
-          grid-template-areas: "nav center right";
-          padding: 2.5rem 3rem;
-          gap: 2rem;
-          align-items: start;
-        }
-
-        .footer-nav {
-          grid-area: nav;
+        /* mobile‑first layout */
+        .wrap {
           display: flex;
           flex-direction: column;
-          gap: 0.75rem;
-          font-family: 'Lora', serif;
+          align-items: center;
+          gap: 2rem;
+          width: 100%;
+        }
+
+        /* nav */
+        .nav {
+          display: flex;
+          flex-direction: column;
+          gap: .7rem;
           text-transform: uppercase;
+          align-items: center;
         }
 
-        .footer-nav a {
-          color: #fff;
+        .nav a,
+        .nav a:visited { /* prevent blue/purple */
+          font-size: .9rem;
+          color: #ffffff;
           text-decoration: none;
-          transition: color 0.2s ease;
+          transition: color .2s;
         }
 
-        .footer-nav a:hover {
+        .nav a:hover {
           color: #e5948b;
         }
 
-        .footer-center {
-          grid-area: center;
+        /* brand */
+        .brand {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: .65rem;
           text-align: center;
         }
 
-        .footer-logo-text {
+        .logo {
           font-family: 'Sancreek', cursive;
-          font-size: 2.5rem;
-          margin-bottom: 1rem;
+          font-size: clamp(1.7rem, 7vw, 2.1rem);
+          line-height: 1.05;
         }
 
-        .footer-cta {
-          font-family: 'Lora', serif;
-          font-size: 1.125rem;
+        .cta,
+        .cta:visited {
+          background: #e5948b;
+          color: #1b1b1b;
+          padding: .55rem 1.25rem;
+          border-radius: 4px;
+          font-family: 'Sancreek', cursive;
+          font-size: 1.2rem;
+          text-decoration: none;
+          transition: transform .25s;
+        }
+
+        .cta:hover {
+          transform: translateY(-3px);
+        }
+
+        .tag {
+          font-size: .95rem;
           color: #e5948b;
         }
 
-        .cta-button {
-          display: inline-block;
-          margin-top: 0.5rem;
-          font-family: 'Sancreek', cursive;
-          font-size: 1.75rem;
-          color: #fff;
-          text-decoration: none;
-          transition: transform 0.2s ease;
-        }
-
-        .cta-button:hover {
-          transform: translateX(4px);
-        }
-
-        .footer-right {
-          grid-area: right;
+        /* contact block */
+        .contact {
           display: flex;
           flex-direction: column;
-          gap: 1.5rem;
-          align-items: flex-end;
+          align-items: center;
+          gap: .7rem;
         }
 
-        .footer-socials {
+        address {
+          font-style: normal;
+          line-height: 1.35;
+          text-align: center;
           display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-          font-family: 'Sancreek', cursive;
+          align-items: flex-start;
+          gap: .35rem;
+          font-size: .9rem;
         }
 
-        .footer-socials a {
-          color: #fff;
+        .phone,
+        .phone:visited {
+          color: #e5948b;
           text-decoration: none;
+          display: flex;
+          gap: .35rem;
         }
 
-        .footer-socials a:hover {
+        .social {
+          display: flex;
+          gap: .8rem;
+        }
+
+        .social a,
+        .social a:visited {
+          color: #ffffff;
+        }
+
+        .social a:hover {
           color: #e5948b;
         }
 
-        .footer-address {
-          font-family: 'Lora', serif;
-          font-size: 0.95rem;
-          line-height: 1.4;
-          text-align: right;
-        }
-
-        .footer-address a {
+        .maps,
+        .maps:visited {
           color: #e5948b;
           text-decoration: none;
+          font-size: .9rem;
         }
 
-        /* Mobile Responsive */
-        @media (max-width: 640px) {
-          .footer-container {
-            flex-direction: column;
-            display: flex;
-            align-items: center;
-            text-align: center;
-            padding: 2rem 1rem;
-            gap: 2rem;
+        /* copyright */
+        .copy {
+          margin-top: 1.5rem;
+          text-align: center;
+          font-size: .8rem;
+          color: #8b897f;
+        }
+
+        /* ===== desktop ≥900 px ===== */
+        @media (min-width: 900px) {
+          .wrap {
+            flex-direction: row;
+            justify-content: space-between; /* anchor to far edges */
+            align-items: flex-start;
           }
 
-          .footer-nav,
-          .footer-socials,
-          .footer-address {
-            align-items: center;
-            text-align: center;
+          .nav {
+            align-items: flex-start;
           }
 
-          .footer-right {
-            align-items: center;
+          .contact {
+            align-items: flex-end;
+            text-align: right;
           }
 
-          .footer-logo-text {
-            font-size: 2rem;
+          address {
+            text-align: right;
+            justify-content: flex-end;
           }
 
-          .cta-button {
-            font-size: 1.5rem;
+          .logo {
+            font-size: 2.4rem;
+          }
+
+          .cta {
+            font-size: 1.4rem;
           }
         }
 
+        /* screen‑reader helper */
         .sr-only {
           position: absolute;
           width: 1px;
