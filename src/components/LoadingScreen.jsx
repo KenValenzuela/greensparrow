@@ -3,8 +3,10 @@
 import {useEffect, useMemo, useState} from 'react';
 import {usePathname} from 'next/navigation';
 import {AnimatePresence, motion} from 'framer-motion';
+import Image from 'next/image';
 import useTypewriter from '@/hooks/useTypewriter';
 
+/* low-weight thumbnails (≈40 kB total) */
 const loadingImages = [
   '/images/loading/axel_piercing.webp',
   '/images/loading/jjk-leg-sleeve-t.webp',
@@ -13,86 +15,72 @@ const loadingImages = [
   '/images/loading/fox-ki.webp',
 ];
 
-const stackedCards = loadingImages.length;
+const CARD_W = 192; // px = 12 rem
+const CARD_H = 288; // px = 18 rem
 const cardSpacing = 224;
-const loadingDuration = 500;            // ms
+const duration = 500; // ms
 
 export default function LoadingScreen({ children }) {
   const pathname = usePathname();
-
-  /* ── State ───────────────────────────────────────── */
-  const [isMobile, setIsMobile] = useState(false); // always false for SSR → no mismatch
+  const [skip, setSkip] = useState(false);
   const [phase, setPhase] = useState('loading');
   const [progress, setProgress] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [showTyped, setShowTyped] = useState(false);
-  const [skip, setSkip] = useState(false);
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+  const typed = useTypewriter(showTyped ? 'ART IS FOOD. WE FEED THE HUNGRY.' : '', 40);
 
-  /* ── Device check (runs only on client) ──────────── */
+  /* skip logic */
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 640);
-    check();
-    window.addEventListener('resize', check, {passive: true});
-    return () => window.removeEventListener('resize', check);
-  }, []);
-
-  /* ── Skip if user already saw loader ─────────────── */
-  useEffect(() => {
-    const seen = sessionStorage.getItem('seenLoader');
-    const showLoader = pathname === '/' && !seen;
-    if (showLoader) sessionStorage.setItem('seenLoader', 'true');
-    else {
+    if (pathname !== '/' || sessionStorage.getItem('seenLoader')) {
       setSkip(true);
       setLoaded(true);
+      return;
     }
+    sessionStorage.setItem('seenLoader', 'true');
   }, [pathname]);
 
-  /* ── Progress bar ─────────────────────────────────  */
+  /* progress bar */
   useEffect(() => {
     if (skip) return;
-    const start = performance.now();
-    const tick = now => {
-      const pct = Math.min(((now - start) / loadingDuration) * 100, 100);
-      setProgress(Math.floor(pct));
-      if (pct < 100) requestAnimationFrame(tick);
+    const t0 = performance.now();
+    const raf = now => {
+      const pct = Math.min(((now - t0) / duration) * 100, 100);
+      setProgress(pct);
+      if (pct < 100) requestAnimationFrame(raf);
     };
-    requestAnimationFrame(tick);
+    requestAnimationFrame(raf);
   }, [skip]);
 
-  /* ── Phase timeline ──────────────────────────────── */
+  /* timeline */
   useEffect(() => {
     if (skip) return;
     const timers = [];
-    const add = (fn, ms) => timers.push(setTimeout(fn, ms));
+    const push = (fn, ms) => timers.push(setTimeout(fn, ms));
 
     if (isMobile) {
-      add(() => {
+      push(() => {
         setPhase('welcome');
         setShowTyped(true);
-      }, loadingDuration);
-      add(() => setPhase('exit'), loadingDuration + 2_000);
-      add(() => setLoaded(true), loadingDuration + 3_000);
+      }, duration);
+      push(() => setPhase('exit'), duration + 2000);
+      push(() => setLoaded(true), duration + 3000);
     } else {
-      add(() => setPhase('stack'), loadingDuration);
-      add(() => setPhase('explode'), loadingDuration + 1_500);
-      add(() => {
+      push(() => setPhase('stack'), duration);
+      push(() => setPhase('explode'), duration + 1500);
+      push(() => {
         setPhase('welcome');
         setShowTyped(true);
-      }, loadingDuration + 3_000);
-      add(() => setPhase('exit'), loadingDuration + 5_000);
-      add(() => setLoaded(true), loadingDuration + 6_000);
+      }, duration + 3000);
+      push(() => setPhase('exit'), duration + 5000);
+      push(() => setLoaded(true), duration + 6000);
     }
     return () => timers.forEach(clearTimeout);
   }, [skip, isMobile]);
 
-  const typed = useTypewriter(
-      showTyped ? 'ART IS FOOD. WE FEED THE HUNGRY.' : '',
-      40
-  );
-
-  /* ── Pre‑compute card geometry ───────────────────── */
-  const cardMeta = useMemo(() => {
-    const center = Math.floor(stackedCards / 2);
+  /* geometry for card animation */
+  const meta = useMemo(() => {
+    const center = Math.floor(loadingImages.length / 2);
     const angleSpread = Math.PI / 1.5;
     const radius = 500;
     return loadingImages.map((src, i) => {
@@ -104,7 +92,7 @@ export default function LoadingScreen({ children }) {
 
   return (
     <div className="relative">
-      {/* ── LOADER ───────────────────────────────────── */}
+      {/* Loader */}
       <AnimatePresence mode="wait">
         {!skip && phase !== 'exit' && (
           <motion.div
@@ -114,7 +102,6 @@ export default function LoadingScreen({ children }) {
             transition={{duration: 0.8}}
             className="fixed inset-0 z-50 text-[#F1EDE0]"
           >
-            {/* progress bar */}
             <div className="absolute top-0 left-0 w-full h-1 bg-black/20">
               <motion.div
                   animate={{width: `${progress}%`, opacity: phase === 'welcome' ? 0 : 1}}
@@ -123,68 +110,65 @@ export default function LoadingScreen({ children }) {
               />
             </div>
 
-            {/* body (single root keeps SSR ↔ CSR identical) */}
             <div className="w-screen h-screen flex items-center justify-center px-4 text-center">
-              <div className="loader-inner w-full">
-                {phase === 'welcome' ? (
-                    <p className="text-lg sm:text-xl font-sancreek typewriter-blink">
-                      {typed}
-                    </p>
-                ) : isMobile ? (
-                    <p className="text-sm font-sancreek">Loading… {progress}%</p>
-                ) : (
-                    <div className="text-center w-full max-w-xl">
-                      <div className="relative w-full h-[18rem]">
-                        {cardMeta.map(({src, i, spreadX, angle, radius, center}) => {
-                          const animateProps =
-                              phase === 'explode'
-                                  ? {
-                                    x: Math.cos(angle) * radius,
-                                    y: Math.sin(angle) * radius,
-                                    rotate: angle * (180 / Math.PI),
-                                    scale: 1.2,
-                                    opacity: 0,
-                                  }
-                                  : {
-                                    x: phase === 'stack' ? 0 : spreadX,
-                                    y: phase === 'stack' ? i * 2 : 0,
-                                    rotate: (i - center) * 5,
-                                    scale: 1,
-                                    opacity: 1,
-                                  };
-                          return (
-                              <motion.div
-                                  key={src}
-                                  initial={{y: -100, opacity: 0}}
-                                  animate={animateProps}
-                                  transition={{delay: i * 0.08, duration: 0.5, type: 'spring'}}
-                                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                                       w-[12rem] h-[18rem] overflow-hidden rounded shadow-md
-                                       border border-bone/10 bg-sparrow-gray/20"
-                              >
-                                <img
-                                    src={src}
-                                    alt={`Flash artwork ${i + 1}`}
-                                    className="w-full h-full object-cover"
-                                    loading="eager"
-                                    decoding="async"
-                                />
-                              </motion.div>
-                          );
-                        })}
-                      </div>
-                      <p className="mt-6 text-lg sm:text-xl font-sancreek">
-                        Loading… {progress}%
-                      </p>
+              {phase === 'welcome' ? (
+                  <p className="text-lg sm:text-xl font-sancreek typewriter-blink">{typed}</p>
+              ) : isMobile ? (
+                  <p className="text-sm font-sancreek">Loading… {Math.floor(progress)}%</p>
+              ) : (
+                  <div className="w-full max-w-xl">
+                    <div className="relative w-full h-[18rem]">
+                      {meta.map(({src, i, spreadX, angle, radius, center}) => {
+                        const anim =
+                            phase === 'explode'
+                                ? {
+                                  x: Math.cos(angle) * radius,
+                                  y: Math.sin(angle) * radius,
+                                  rotate: angle * (180 / Math.PI),
+                                  scale: 1.2,
+                                  opacity: 0,
+                                }
+                                : {
+                                  x: phase === 'stack' ? 0 : spreadX,
+                                  y: phase === 'stack' ? i * 2 : 0,
+                                  rotate: (i - center) * 5,
+                                  scale: 1,
+                                  opacity: 1,
+                                };
+                        return (
+                            <motion.div
+                                key={src}
+                                initial={{y: -100, opacity: 0}}
+                                animate={anim}
+                                transition={{delay: i * 0.08, duration: 0.5, type: 'spring'}}
+                                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+                                     w-[12rem] h-[18rem] overflow-hidden rounded shadow-md
+                                     border border-bone/10 bg-sparrow-gray/20"
+                            >
+                              <Image
+                                  src={src}
+                                  alt={`Flash artwork ${i + 1}`}
+                                  width={CARD_W}
+                                  height={CARD_H}
+                                  quality={60}
+                                  placeholder="empty"
+                                  style={{objectFit: 'cover'}}
+                              />
+                            </motion.div>
+                        );
+                      })}
                     </div>
-                )}
-              </div>
+                    <p className="mt-6 text-lg sm:text-xl font-sancreek">
+                      Loading… {Math.floor(progress)}%
+                    </p>
+                  </div>
+              )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ── APP CONTENT ──────────────────────────────── */}
+      {/* App */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: loaded ? 1 : 0 }}
@@ -194,10 +178,8 @@ export default function LoadingScreen({ children }) {
         {children}
       </motion.div>
 
-      {/* ── Styles ───────────────────────────────────── */}
+      {/* Inline style needs nonce; Next injects it automatically from x-nonce */}
       <style jsx>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sancreek&display=swap');
-
         .font-sancreek {
           font-family: 'Sancreek', cursive;
         }
@@ -210,6 +192,7 @@ export default function LoadingScreen({ children }) {
             opacity: 0;
           }
         }
+
         .typewriter-blink::after {
           content: '|';
           margin-left: 4px;
