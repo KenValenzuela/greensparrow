@@ -15,7 +15,7 @@ const loadingImages = [
 
 const stackedCards = loadingImages.length;
 const cardSpacing = 224;
-const loadingDuration = 4_000;            // ms
+const loadingDuration = 500;            // ms
 
 export default function LoadingScreen({ children }) {
   const pathname = usePathname();
