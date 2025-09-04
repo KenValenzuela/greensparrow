@@ -1,284 +1,313 @@
-// components/BookingForm.jsx
-// multi-step booking form (CSR)
-
 'use client';
 
 import {useEffect, useState} from 'react';
-import {supabase} from '@/utils/supabaseClient';
-import {toast} from 'react-hot-toast';
-import ImageUpload from './ImageUpload';
-import {AnimatePresence, motion} from 'framer-motion';
+import {useRouter} from 'next/navigation';
+import toast from 'react-hot-toast';
 
-/* ── constants ── */
-const STEP_LABELS = [
-    'Intro', 'Contact', 'Artist', 'Style',
-    'Customer Type', 'Date', 'Idea & Placement',
-    'Images', 'Review',
-];
+const initial = {
+  name: '',
+  email: '',
+  phone: '',
+  preferred_artist: '',
+  first_available: false,
+  appointment_date: '',
+  appointment_end: '',
+  placement: '',
+  preferred_style: [],
+  customer_type: 'New',
+  message: '',
+  images: [],
+};
+
 const ARTISTS = ['Joe', 'Mickey', 'T', 'Mia', 'Ki', 'Axel'];
-const STYLES = [
-  'Black & Grey', 'Cyber Sigilism', 'Anime', 'Flora & Fauna',
-  'Fineline', 'Neo Traditional', 'Portrait', 'Piercing',
-];
-const CUSTOMER_TYPE = ['New', 'Returning'];
+const STYLES = ['Black & Grey', 'Traditional', 'Neo-traditional', 'Fine Line', 'Color'];
 
-/* ── helpers ── */
-const chip = (active) => ({
-    margin: '.3em', padding: '.5em 1em',
-    border: '2px solid #488955', borderRadius: 24,
-    background: active ? '#e7b462' : '#1c1f1a',
-    color: '#fff', cursor: 'pointer',
-});
-
-/* ── component ── */
 export default function BookingForm() {
-    /* state */
-  const [form, setForm] = useState({
-    name: '', email: '', phone: '',
-    message: '', placement: '',
-    artist: [], style: [], customerType: [],
-  });
-  const [dateType, setDateType] = useState('single');
-  const [dateStart, setDateStart] = useState('');
-    const [dateEnd, setDateEnd] = useState('');
-    const [images, setImages] = useState([]);
-    const [step, setStep] = useState(0);
-  const [submitting, setSubmitting] = useState(false);
-    const [submitted, setSubmitted] = useState(false);
+  const router = useRouter();
+  const [form, setForm] = useState(initial);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
 
-    /* anon session id (for funnel) */
-  useEffect(() => {
-      if (!localStorage.getItem('session_id')) {
-      localStorage.setItem('session_id', crypto.randomUUID());
-      }
-  }, []);
+  const set = (k, v) => setForm(prev => ({...prev, [k]: v}));
 
-    /* analytics per step */
-  useEffect(() => {
-    if (step === 1) logEvent('booking_started');
-      logEvent('booking_step_view', {step, step_label: STEP_LABELS[step]});
-  }, [step]);
-
-    /* field helpers */
-    const handleChange = (e) =>
-        setForm((p) => ({...p, [e.target.name]: e.target.value}));
-
-    const toggle = (key, val) =>
-        setForm((p) => {
-      const arr = p[key];
-            return {
-                ...p,
-                [key]: arr.includes(val) ? arr.filter((v) => v !== val) : [...arr, val],
-            };
-        });
-
-    /* image upload → storage paths */
-  const uploadImages = async () => {
-    const paths = [];
-      for (const {file} of images) {
-          const ext = file.name.split('.').pop();
-          const key = `booking_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-          const {error} = await supabase.storage
-              .from('booking-images')
-              .upload(key, file, {cacheControl: '3600', upsert: false, contentType: file.type});
-      if (error) throw new Error(error.message);
-      paths.push(key);
-    }
-    return paths;
+  const onStyleToggle = (val) => {
+    setForm(prev => {
+      const has = prev.preferred_style.includes(val);
+      return {
+        ...prev,
+        preferred_style: has ? prev.preferred_style.filter(s => s !== val) : [...prev.preferred_style, val]
+      };
+    });
   };
 
-    /* generic event logger */
-    const logEvent = async (event_name, metadata = {}) => {
+  useEffect(() => {
     try {
-      await fetch('/api/log-event', {
-        method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            event_name,
-          customer_email: form.email || null,
-          artist: form.artist[0] || null,
-          style: form.style[0] || null,
-          source: 'booking_form',
-          session_id: localStorage.getItem('session_id'),
-          metadata,
-        }),
-      });
+      const saved = localStorage.getItem('booking_draft');
+      if (saved) setForm(JSON.parse(saved));
     } catch {
-        /* ignored */
     }
-  };
+  }, []);
+  useEffect(() => {
+    try {
+      localStorage.setItem('booking_draft', JSON.stringify(form));
+    } catch {
+    }
+  }, [form]);
 
-  /* submit */
-    const handleSubmit = async (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
-    if (!form.name || !form.email || !form.message || !dateStart ||
-        (dateType === 'range' && !dateEnd)) {
-      toast.error('Please complete required fields');
+    setErr('');
+
+    // Client-side checks for better UX
+    if (!form.name || !form.email || !form.message || !form.appointment_date) {
+      setErr('Please complete all required fields.');
+      return;
+    }
+    if (!form.first_available && !form.preferred_artist) {
+      setErr('Select an artist or choose “First available”.');
       return;
     }
 
-    setSubmitting(true);
+    setBusy(true);
+    toast.loading('Submitting…', {id: 'book'});
     try {
-      const imagePaths = images.length ? await uploadImages() : [];
-
       const res = await fetch('/api/book', {
         method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          name: form.name.trim(),
-          email: form.email.trim().toLowerCase(),
-          phone: form.phone.trim(),
-          message: form.message.trim(),
-          placement: form.placement.trim(),
-          appointment_date: dateStart,
-          appointment_end: dateEnd || null,
-          preferred_artist: form.artist[0] || null,
-          preferred_style: form.style,
-          customer_type: form.customerType[0] || 'New',
-          images: imagePaths,
-        }),
+        headers: {'content-type': 'application/json'},
+        body: JSON.stringify(form),
       });
-        if (!res.ok) throw new Error('Server error');
+      const data = await res.json().catch(() => ({}));
 
-      toast.success('Booking submitted!');
-      logEvent('booking_submitted');
-      setSubmitted(true);
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    } catch (err) {
-      toast.error(`Submission failed: ${err.message}`);
+      if (!res.ok || data?.ok === false) {
+        const detail = data?.error || `Submit failed (${res.status})`;
+        setErr(detail);
+        toast.error(detail, {id: 'book'});
+        setBusy(false);
+        return;
+      }
+
+      toast.success('Request sent!', {id: 'book'});
+      setForm(initial);
+      try {
+        localStorage.removeItem('booking_draft');
+      } catch {
+      }
+      const id = data?.id ? `?id=${encodeURIComponent(data.id)}` : '';
+      router.push(`/booking/success${id}`);
+    } catch {
+      setErr('Network error. Please try again.');
+      toast.error('Network error', {id: 'book'});
     } finally {
-      setSubmitting(false);
+      setBusy(false);
     }
-  };
-
-    /* step components */
-  const steps = [
-      /* 0 – intro */
-      <div key="intro">
-      <h2>Before You Book</h2>
-          <p>Our artists work mainly by appointment; walk-ins are rare.</p>
-          <button type="button" onClick={() => setStep(1)}>Start</button>
-    </div>,
-
-      /* 1 – contact */
-    <div key="contact">
-      <label>Name*</label>
-        <input name="name" value={form.name} onChange={handleChange}/>
-      <label>Email*</label>
-        <input type="email" name="email" value={form.email} onChange={handleChange}/>
-      <label>Phone (optional)</label>
-        <input name="phone" value={form.phone} onChange={handleChange}/>
-    </div>,
-
-      /* 2 – artist */
-    <div key="artist">
-      <h3>Preferred Artist</h3>
-        {ARTISTS.map((a) => (
-            <button key={a} type="button"
-                    onClick={() => toggle('artist', a)}
-                    style={chip(form.artist.includes(a))}>{a}</button>
-      ))}
-    </div>,
-
-      /* 3 – style */
-    <div key="style">
-      <h3>Style</h3>
-        {STYLES.map((s) => (
-            <button key={s} type="button"
-                    onClick={() => toggle('style', s)}
-                    style={chip(form.style.includes(s))}>{s}</button>
-      ))}
-    </div>,
-
-      /* 4 – customer type */
-    <div key="cust">
-      <h3>Visited Before?</h3>
-        {CUSTOMER_TYPE.map((t) => (
-            <button key={t} type="button"
-                    onClick={() => toggle('customerType', t)}
-                    style={chip(form.customerType.includes(t))}>{t}</button>
-      ))}
-    </div>,
-
-      /* 5 – date */
-    <div key="date">
-      <h3>Preferred Date</h3>
-      <label><input type="radio" checked={dateType === 'single'}
-                    onChange={() => setDateType('single')}/> Specific</label>
-      <label><input type="radio" checked={dateType === 'range'}
-                    onChange={() => setDateType('range')}/> Range</label>
-        <input type="date" value={dateStart} onChange={(e) => setDateStart(e.target.value)}/>
-        {dateType === 'range' && (
-            <input type="date" value={dateEnd} onChange={(e) => setDateEnd(e.target.value)}/>
-        )}
-    </div>,
-
-      /* 6 – idea & placement */
-      <div key="idea">
-      <label>Describe Your Idea*</label>
-      <textarea name="message" value={form.message}
-                onChange={handleChange} placeholder="Size, colours, etc."/>
-          <label>Placement (e.g. forearm)</label>
-          <input name="placement" value={form.placement} onChange={handleChange}/>
-    </div>,
-
-      /* 7 – images */
-    <div key="img">
-      <label>Reference Images (optional)</label>
-        <ImageUpload images={images} setImages={setImages} max={5}/>
-    </div>,
-
-      /* 8 – review */
-    <div key="review">
-      <h3>Review &amp; Submit</h3>
-      <button type="submit" disabled={submitting}>
-        {submitting ? 'Submitting…' : 'Submit Booking'}
-      </button>
-    </div>,
-  ];
-
-  /* render */
-  if (submitted) {
-    return (
-        <div style={confWrap}>
-            <h2 style={confHead}>Thanks!</h2>
-            <p>We’ll email you soon to confirm a time.</p>
-        </div>
-    );
   }
 
   return (
-      <form onSubmit={handleSubmit} style={formWrap}>
-          <div style={progOuter}>
-              <div style={{...progInner, width: `${(step / (steps.length - 1)) * 100}%`}}/>
-      </div>
+      <form onSubmit={handleSubmit} className="mx-auto grid gap-6">
+        {/* Card: Heading / context */}
+        <div className="mx-auto w-full max-w-2xl rounded-xl border border-white/10 bg-white/5 p-5 backdrop-blur">
+          <h2 className="mb-1 font-serif text-2xl text-[#F1EDE0]">Book an appointment</h2>
+          <p className="text-sm text-white/70">Typical reply time: 1–2 business days.</p>
 
-      <AnimatePresence mode="wait">
-          <motion.div
-              key={step}
-              initial={{opacity: 0, x: 40}}
-              animate={{opacity: 1, x: 0}}
-              exit={{opacity: 0, x: -40}}
-              transition={{duration: .35}}
+          {err && (
+              <div
+                  role="alert"
+                  className="mt-4 rounded-md border border-red-400/40 bg-red-500/10 px-3 py-2 text-sm text-red-200"
+              >
+                <strong className="block">Could not submit</strong>
+                <span className="opacity-90">{err}</span>
+              </div>
+          )}
+
+          {/* Grid: contact + placement */}
+          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+            <Field label="Name" required>
+              <input
+                  className="input"
+                  value={form.name}
+                  onChange={e => set('name', e.target.value)}
+                  aria-invalid={!form.name ? 'true' : 'false'}
+              />
+            </Field>
+            <Field label="Email" required>
+              <input
+                  className="input"
+                  type="email"
+                  value={form.email}
+                  onChange={e => set('email', e.target.value)}
+                  aria-invalid={!form.email ? 'true' : 'false'}
+              />
+            </Field>
+            <Field label="Phone">
+              <input className="input" value={form.phone} onChange={e => set('phone', e.target.value)}/>
+            </Field>
+            <Field label="Placement">
+              <input className="input" value={form.placement} onChange={e => set('placement', e.target.value)}
+                     placeholder="e.g., left forearm"/>
+            </Field>
+          </div>
+
+          {/* Grid: dates */}
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <Field label="Preferred date" required>
+              <input
+                  className="input"
+                  type="date"
+                  value={form.appointment_date}
+                  onChange={e => set('appointment_date', e.target.value)}
+                  aria-invalid={!form.appointment_date ? 'true' : 'false'}
+              />
+            </Field>
+            <Field label="End time (optional)">
+              <input
+                  className="input"
+                  type="time"
+                  value={form.appointment_end}
+                  onChange={e => set('appointment_end', e.target.value)}
+              />
+            </Field>
+          </div>
+
+          {/* Artist section */}
+          <fieldset className="mt-4 rounded-lg border border-white/10 p-3">
+            <legend className="px-1 text-sm text-white/80">Artist</legend>
+
+            <label className="mb-2 inline-flex cursor-pointer items-center gap-2 text-white/90">
+              <input
+                  type="checkbox"
+                  className="h-4 w-4 accent-[#2a8f5c]"
+                  checked={form.first_available}
+                  onChange={e => set('first_available', e.target.checked)}
+              />
+              First available
+            </label>
+
+            <div className="mt-2 flex flex-wrap gap-2">
+              {ARTISTS.map(a => {
+                const active = !form.first_available && form.preferred_artist === a;
+                return (
+                    <button
+                        key={a}
+                        type="button"
+                        onClick={() => set('preferred_artist', active ? '' : a)}
+                        disabled={form.first_available}
+                        className={[
+                          'rounded-full border px-3 py-1 text-sm transition',
+                          form.first_available
+                              ? 'cursor-not-allowed border-white/10 text-white/30'
+                              : active
+                                  ? 'border-[#2a8f5c]/70 bg-[#2a8f5c]/20 text-white'
+                                  : 'border-white/15 text-white/80 hover:border-white/30',
+                        ].join(' ')}
+                        aria-pressed={active}
+                    >
+                      {a}
+                    </button>
+                );
+              })}
+            </div>
+          </fieldset>
+
+          {/* Styles section */}
+          <fieldset className="mt-4 rounded-lg border border-white/10 p-3">
+            <legend className="px-1 text-sm text-white/80">Styles</legend>
+            <div className="flex flex-wrap gap-2">
+              {STYLES.map(s => {
+                const on = form.preferred_style.includes(s);
+                return (
+                    <button
+                        key={s}
+                        type="button"
+                        onClick={() => onStyleToggle(s)}
+                        className={[
+                          'rounded-full border px-3 py-1 text-sm transition',
+                          on
+                              ? 'border-[#e5948b]/70 bg-[#e5948b]/20 text-white'
+                              : 'border-white/15 text-white/80 hover:border-white/30',
+                        ].join(' ')}
+                        aria-pressed={on}
+                    >
+                      {s}
+                    </button>
+                );
+              })}
+            </div>
+          </fieldset>
+
+          {/* Message */}
+          <Field className="mt-4" label="Describe your idea" required>
+          <textarea
+              className="input min-h-[120px]"
+              value={form.message}
+              onChange={e => set('message', e.target.value)}
+              aria-invalid={!form.message ? 'true' : 'false'}
+              placeholder="Size, placement, reference details…"
+          />
+          </Field>
+
+          {/* Footer row */}
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <select
+                className="input max-w-[220px]"
+                value={form.customer_type}
+                onChange={e => set('customer_type', e.target.value)}
           >
-          {steps[step]}
-        </motion.div>
-      </AnimatePresence>
+              <option>New</option>
+              <option>Returning</option>
+            </select>
 
-          <div style={navRow}>
-              {step > 0 && <button type="button" onClick={() => setStep((s) => s - 1)}>Back</button>}
-              {step < steps.length - 1 && (
-                  <button type="button" onClick={() => setStep((s) => s + 1)}>Next</button>
-              )}
+            <div className="flex items-center gap-2">
+              <a href="tel:+16022093099"
+                 className="rounded-md border border-white/15 px-3 py-2 text-white/80 hover:border-white/30">Call the
+                shop</a>
+              <button
+                  type="submit"
+                  disabled={busy}
+                  className="inline-flex items-center gap-2 rounded-md border border-[#2a8f5c]/60 bg-[#2a8f5c]/30 px-4 py-2 text-white transition disabled:opacity-60"
+              >
+                {busy && <Spinner/>}
+                {busy ? 'Submitting…' : 'Submit request'}
+              </button>
+            </div>
+          </div>
       </div>
+
+        {/* tiny style shim for inputs if you aren’t using a Tailwind plugin */}
+        <style jsx>{`
+          .input {
+            padding: 0.6rem 0.75rem;
+            border: 1px solid rgba(241, 237, 224, 0.14);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            color: #f4f4f4;
+            outline: none;
+            width: 100%;
+          }
+
+          .input:focus {
+            border-color: #e5948b;
+          }
+        `}</style>
     </form>
   );
 }
 
-/* ── styles ── */
-const formWrap = {maxWidth: 600, margin: '0 auto', padding: '1.5rem'};
-const progOuter = {height: 8, background: '#3a2323', borderRadius: 4, marginBottom: '1rem'};
-const progInner = {height: '100%', background: '#F1EDE0'};
-const navRow = {marginTop: '1rem', display: 'flex', justifyContent: 'space-between'};
-const confWrap = {textAlign: 'center', padding: '3rem 0'};
-const confHead = {fontSize: '1.75rem', margin: 0};
+function Field({label, required, children, className = ''}) {
+  return (
+      <label className={`grid gap-1 ${className}`}>
+      <span className="text-white/90">
+        {label} {required && <span className="text-white/60">*</span>}
+      </span>
+        {children}
+      </label>
+  );
+}
+
+function Spinner() {
+  return (
+      <span
+          className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"
+          aria-hidden="true"
+      />
+  );
+}

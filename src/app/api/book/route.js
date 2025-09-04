@@ -1,135 +1,119 @@
-// app/api/book/route.js
-// POST /api/book  ← save booking + trigger confirm email
+import {NextResponse} from 'next/server';
+import {Resend} from 'resend';
 
-import { supabase } from '@/utils/supabaseClient';
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
-const EMAIL_FN_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/email-booking-confirm`;
-const AUTH_HEADER = {Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`};
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-/* cookie → object */
-const parseCookies = (str = '') =>
-  Object.fromEntries(
-    str.split(';').map((c) => {
-      const [k, ...v] = c.trim().split('=');
-      return [decodeURIComponent(k), decodeURIComponent(v.join('='))];
-    }),
-  );
+const SHOP_INBOX = process.env.SHOP_INBOX || 'greensparrowtattooco@gmail.com';
+const MAIL_FROM = process.env.MAIL_FROM || 'Green Sparrow Tattoo <booking@greensparrowtattoocompany.com>';
+const OPEN = process.env.BOOKING_ENABLED !== '0';
+const PUB = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+
+const esc = (s) =>
+    String(s ?? '').replace(/[&<>"']/g, (m) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    }[m]));
+
+const required = ['name', 'email', 'message', 'appointment_date'];
+
+function isEmail(x) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(x || ''));
+}
 
 export async function POST(req) {
+  if (!OPEN) return NextResponse.json({error: 'Online booking is temporarily disabled'}, {status: 503});
+  if (!process.env.RESEND_API_KEY) return NextResponse.json({error: 'Email service not configured'}, {status: 503});
+  if (!/@/.test(MAIL_FROM)) return NextResponse.json({error: 'MAIL_FROM is not a valid sender'}, {status: 503});
+
+  // Parse + lightweight validate
+  const b = await req.json().catch(() => ({}));
+  for (const k of required) {
+    if (!b?.[k]) return NextResponse.json({error: `Missing ${k}`}, {status: 400});
+  }
+  if (!isEmail(b.email)) return NextResponse.json({error: 'Invalid email'}, {status: 400});
+
+  const imgs = Array.isArray(b.images) ? b.images : [];
+  const imgLinks = (PUB && imgs.length)
+      ? imgs.map((key) =>
+          `<a href="${PUB}/storage/v1/object/public/booking-images/${encodeURIComponent(key)}">${esc(key)}</a>`
+      ).join('<br/>')
+      : (imgs.map(esc).join(', ') || '—');
+
+  const subject =
+      `[Booking Request] ${esc(b.name)} → ${b.first_available ? 'First available' : esc(b.preferred_artist || 'Unspecified')}`;
+
+  const html = `
+    <h3>New booking request</h3>
+    <p>
+      <b>Name:</b> ${esc(b.name)}<br/>
+      <b>Email:</b> ${esc(b.email)}<br/>
+      <b>Phone:</b> ${esc(b.phone || '—')}<br/>
+      <b>Requested artist:</b> ${b.first_available ? 'First available' : esc(b.preferred_artist || '—')}<br/>
+      <b>Preferred date:</b> ${esc(b.appointment_date)}${b.appointment_end ? ' – ' + esc(b.appointment_end) : ''}<br/>
+      <b>Placement:</b> ${esc(b.placement || '—')}<br/>
+      <b>Style(s):</b> ${(Array.isArray(b.preferred_style) && b.preferred_style.length) ? b.preferred_style.map(esc).join(', ') : '—'}<br/>
+      <b>Customer type:</b> ${esc(b.customer_type || 'New')}<br/>
+      <b>Description:</b> ${esc(b.message)}<br/>
+      <b>Images:</b> ${imgLinks}
+    </p>
+    <p>Routed to shop inbox for assignment.</p>
+  `.trim();
+
+  const text =
+      `New booking request
+
+Name: ${b.name}
+Email: ${b.email}
+Phone: ${b.phone || '—'}
+Requested artist: ${b.first_available ? 'First available' : (b.preferred_artist || '—')}
+Preferred date: ${b.appointment_date}${b.appointment_end ? ' – ' + b.appointment_end : ''}
+Placement: ${b.placement || '—'}
+Style(s): ${Array.isArray(b.preferred_style) && b.preferred_style.length ? b.preferred_style.join(', ') : '—'}
+Customer type: ${b.customer_type || 'New'}
+Description: ${b.message}
+Images: ${imgs.length ? imgs.join(', ') : '—'}
+`;
+
+  // Try with reply_to; if the SDK rejects the field name, retry with replyTo
   try {
-      /* 1. inputs */
-    const {
-      name,
-      email,
-      phone,
-      message,
-        placement,
-      preferred_artist,
-      preferred_style,
-      customer_type,
-      appointment_date,
-        appointment_end,
-      images = [],
-    } = await req.json();
+    const sendPayload = {
+      from: MAIL_FROM,                 // must be a verified sender domain
+      to: [SHOP_INBOX],                // array form is fine, supports multiple recipients
+      subject,
+      html,
+      text,
+      reply_to: b.email,               // attempt 1
+    };
 
-      /* 2. upsert customer */
-      const [first_name, ...rest] = name.trim().split(' ');
-    const { data: customer, error: custErr } = await supabase
-      .from('customers')
-      .upsert(
-        {
-          first_name,
-          last_name: rest.join(' ') || null,
-          email: email.toLowerCase(),
-          phone,
-          customer_type,
-        },
-          {onConflict: 'email'},
-      )
-      .select('id')
-      .single();
-    if (custErr) throw custErr;
-    const customer_id = customer.id;
+    let res = await resend.emails.send(sendPayload);
 
-      /* 3. lookup artist (optional) */
-    let artist_id = null;
-    if (preferred_artist) {
-      const { data: artist, error: artErr } = await supabase
-        .from('artists')
-        .select('id')
-        .eq('name', preferred_artist)
-        .maybeSingle();
-      if (artErr) throw artErr;
-      artist_id = artist?.id || null;
+    if (res?.error && String(res.error).toLowerCase().includes('reply')) {
+      const retryPayload = {...sendPayload};
+      delete retryPayload.reply_to;
+      // Some SDK versions prefer camelCase:
+      retryPayload.replyTo = b.email;  // attempt 2
+      res = await resend.emails.send(retryPayload);
     }
 
-      /* 4. insert booking */
-    const { data: booking, error: bookErr } = await supabase
-      .from('bookings')
-      .insert([
-        {
-          customer_id,
-          preferred_artist: artist_id,
-            preferred_style,
-          message,
-            placement,
-          appointment_date,
-            appointment_end,
-            images, // storage paths
-        },
-      ])
-      .select('id')
-      .single();
-    if (bookErr) throw bookErr;
-    const booking_id = booking.id;
+    if (res?.error) {
+      // Surface detailed error to client and logs for quick diagnosis
+      console.error('RESEND_SEND_ERROR', res.error);
+      return NextResponse.json({ok: false, error: res.error}, {status: 502});
+    }
 
-      /* 5. analytics event */
-      const cookies = parseCookies(req.headers.get('cookie'));
-      const session_id = cookies.session_id ?? crypto.randomUUID();
-      const source =
-      cookies.utm_source ??
-      new URL(req.headers.get('referer') || 'https://direct').hostname;
-
-    await supabase.from('booking_events').insert([
-      {
-        event_name: 'booking_submitted',
-        customer_email: email.toLowerCase(),
-        artist: preferred_artist,
-        style: preferred_style?.join(', ') || null,
-        source,
-        session_id,
-        metadata: {
-          referer: req.headers.get('referer') || null,
-          user_agent: req.headers.get('user-agent') || null,
-        },
-      },
-    ]);
-
-      /* 6. fire confirm email (Edge Function → Resend) */
-    await fetch(EMAIL_FN_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...AUTH_HEADER },
-      body: JSON.stringify({
-        booking_id,
-        name,
-        email,
-        phone,
-        message,
-          placement,
-        preferred_artist,
-        preferred_style,
-        appointment_date,
-          appointment_end,
-        images,
-      }),
-    });
-
-    return new Response(JSON.stringify({ success: true }), { status: 200 });
+    return NextResponse.json({ok: true, id: res?.data?.id}, {status: 200});
   } catch (err) {
-    console.error('[book] API error:', err);
-    return new Response(
-      JSON.stringify({ success: false, error: err.message }),
-        {status: 500},
-    );
+    console.error('RESEND_SEND_THROW', {
+      name: err?.name,
+      code: err?.code,
+      message: err?.message,
+    });
+    return NextResponse.json({ok: false, error: 'EMAIL_SEND_FAILED'}, {status: 502});
   }
 }

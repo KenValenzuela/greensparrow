@@ -1,12 +1,12 @@
 'use client';
 
 import {useEffect, useMemo, useState} from 'react';
+import {Toaster} from 'react-hot-toast';
 import {usePathname} from 'next/navigation';
 import {AnimatePresence, motion} from 'framer-motion';
 import Image from 'next/image';
 import useTypewriter from '@/hooks/useTypewriter';
 
-/* low-weight thumbnails (≈40 kB total) */
 const loadingImages = [
   '/images/loading/axel_piercing.webp',
   '/images/loading/jjk-leg-sleeve-t.webp',
@@ -15,49 +15,64 @@ const loadingImages = [
   '/images/loading/fox-ki.webp',
 ];
 
-const CARD_W = 192; // px = 12 rem
-const CARD_H = 288; // px = 18 rem
+const CARD_W = 192;
+const CARD_H = 288;
 const cardSpacing = 224;
-const duration = 500; // ms
+const duration = 500;
 
 export default function LoadingScreen({ children }) {
   const pathname = usePathname();
-  const [skip, setSkip] = useState(false);
+  const initialSkip = useMemo(() => pathname !== '/', [pathname]);
+  const [skip, setSkip] = useState(initialSkip);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    if (pathname !== '/') {
+      setSkip(true);
+      return;
+    }
+    if (sessionStorage.getItem('seenLoader')) setSkip(true);
+    else sessionStorage.setItem('seenLoader', 'true');
+  }, [mounted, pathname]);
+
   const [phase, setPhase] = useState('loading');
   const [progress, setProgress] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [showTyped, setShowTyped] = useState(false);
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+
+  const [vw, setVw] = useState(0);
+  useEffect(() => {
+    if (!mounted) return;
+    const update = () => setVw(window.innerWidth);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, [mounted]);
+  const isMobile = vw > 0 && vw < 640;
+
   const typed = useTypewriter(showTyped ? 'ART IS FOOD. WE FEED THE HUNGRY.' : '', 40);
 
-  /* skip logic */
   useEffect(() => {
-    if (pathname !== '/' || sessionStorage.getItem('seenLoader')) {
-      setSkip(true);
-      setLoaded(true);
-      return;
-    }
-    sessionStorage.setItem('seenLoader', 'true');
-  }, [pathname]);
-
-  /* progress bar */
-  useEffect(() => {
-    if (skip) return;
+    if (!mounted || skip) return;
     const t0 = performance.now();
+    let id;
     const raf = now => {
       const pct = Math.min(((now - t0) / duration) * 100, 100);
       setProgress(pct);
-      if (pct < 100) requestAnimationFrame(raf);
+      if (pct < 100) id = requestAnimationFrame(raf);
     };
-    requestAnimationFrame(raf);
-  }, [skip]);
+    id = requestAnimationFrame(raf);
+    return () => cancelAnimationFrame(id);
+  }, [mounted, skip]);
 
-  /* timeline */
   useEffect(() => {
-    if (skip) return;
+    if (!mounted || skip) return;
     const timers = [];
     const push = (fn, ms) => timers.push(setTimeout(fn, ms));
-
     if (isMobile) {
       push(() => {
         setPhase('welcome');
@@ -76,9 +91,8 @@ export default function LoadingScreen({ children }) {
       push(() => setLoaded(true), duration + 6000);
     }
     return () => timers.forEach(clearTimeout);
-  }, [skip, isMobile]);
+  }, [mounted, skip, isMobile]);
 
-  /* geometry for card animation */
   const meta = useMemo(() => {
     const center = Math.floor(loadingImages.length / 2);
     const angleSpread = Math.PI / 1.5;
@@ -92,9 +106,8 @@ export default function LoadingScreen({ children }) {
 
   return (
     <div className="relative">
-      {/* Loader */}
       <AnimatePresence mode="wait">
-        {!skip && phase !== 'exit' && (
+        {mounted && !skip && phase !== 'exit' && (
           <motion.div
             key="loader"
             initial={{ opacity: 1 }}
@@ -168,17 +181,17 @@ export default function LoadingScreen({ children }) {
         )}
       </AnimatePresence>
 
-      {/* App */}
       <motion.div
         initial={{ opacity: 0 }}
-        animate={{ opacity: loaded ? 1 : 0 }}
+        animate={{opacity: loaded || skip ? 1 : 0}}
         transition={{duration: 0.8}}
-        className={loaded ? 'opacity-100' : 'pointer-events-none'}
+        className={loaded || skip ? 'opacity-100' : 'pointer-events-none'}
       >
         {children}
       </motion.div>
 
-      {/* Inline style needs nonce; Next injects it automatically from x-nonce */}
+      <Toaster position="top-center"/>
+
       <style jsx>{`
         .font-sancreek {
           font-family: 'Sancreek', cursive;
@@ -186,10 +199,10 @@ export default function LoadingScreen({ children }) {
 
         @keyframes blink {
           0%, 100% {
-            opacity: 1;
+            opacity: 1
           }
           50% {
-            opacity: 0;
+            opacity: 0
           }
         }
 

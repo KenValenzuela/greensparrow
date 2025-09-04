@@ -1,16 +1,15 @@
-// app/(booking)/page.jsx
-// Booking page wrapper – unchanged visual layout, “use client” added for full CSR.
+// src/app/booking/page.jsx
+// Server Component wrapper — imports the client BookingForm
+import BookingForm from '@/components/BookingForm'; // if @ alias isn't set, use: ../../components/BookingForm
+import styles from './booking.module.css';
 
-'use client';
-
-import BookingForm from '@/components/BookingForm';
+export const dynamic = 'force-dynamic';
 
 export default function BookingPage() {
   return (
     <main
-      className="booking-main"
+        className={styles.main}
       style={{
-
           backgroundSize: 'cover',
         backgroundRepeat: 'repeat',
         backgroundPosition: 'center top',
@@ -35,44 +34,22 @@ export default function BookingPage() {
         >
           Book an Appointment
         </h1>
-        <p
-          style={{
-            marginTop: '1rem',
-            maxWidth: '600px',
-            fontSize: '1rem',
-            lineHeight: 1.6,
-          }}
-        >
-            Use the form below to request an appointment—we’ll reach out to confirm. If you already
-            know who you’d like to work with, feel free to message your preferred artist directly.
+          <p style={{marginTop: '1rem', maxWidth: 600, fontSize: '1rem', lineHeight: 1.6}}>
+              Use the form below to request an appointment—we’ll reach out to confirm.
+              If you already know who you’d like to work with, feel free to message your preferred artist directly.
         </p>
       </header>
 
-      <section
-        className="booking-section"
-        style={{
-          width: '100%',
-          maxWidth: '1200px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1.5rem',
-        }}
-      >
-        <div
-          className="booking-content"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1.5rem',
-          }}
-        >
+        <section className={styles.section}
+                 style={{width: '100%', maxWidth: 1200, display: 'flex', flexDirection: 'column', gap: '1.5rem'}}>
+            <div className={styles.content} style={{display: 'flex', flexDirection: 'column', gap: '1.5rem'}}>
           {/* Booking Form */}
           <div
             style={{
               width: '100%',
               backgroundColor: 'rgba(42,42,42,0.95)',
               padding: '1.5rem',
-              borderRadius: '10px',
+                borderRadius: 10,
               flex: 1,
               boxSizing: 'border-box',
             }}
@@ -80,13 +57,13 @@ export default function BookingPage() {
             <BookingForm />
           </div>
 
-          {/* Embedded Map */}
+                {/* Embedded Map (non-blocking) */}
           <div
             style={{
               width: '100%',
               display: 'flex',
               justifyContent: 'center',
-              borderRadius: '12px',
+                borderRadius: 12,
               overflow: 'hidden',
               flex: 1,
             }}
@@ -97,8 +74,8 @@ export default function BookingPage() {
               width="100%"
               height="100%"
               style={{
-                maxWidth: '600px',
-                minHeight: '420px',
+                  maxWidth: 600,
+                  minHeight: 420,
                 height: '100%',
                 border: 0,
                 filter: 'grayscale(30%) brightness(95%) contrast(95%)',
@@ -110,20 +87,6 @@ export default function BookingPage() {
           </div>
         </div>
       </section>
-
-      <style jsx>{`
-        @media (min-width: 768px) {
-          .booking-content {
-            flex-direction: row !important;
-            align-items: flex-start !important;
-            gap: 1rem !important;
-          }
-
-          .booking-section {
-            gap: 1.25rem !important;
-          }
-        }
-      `}</style>
     </main>
   );
 }
