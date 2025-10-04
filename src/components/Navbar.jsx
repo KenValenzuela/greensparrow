@@ -17,9 +17,10 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
-  /* sticky shadow */
+  /* sticky shadow + blur */
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 90);
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
     window.addEventListener('scroll', onScroll, {passive: true});
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -29,12 +30,17 @@ export default function Navbar() {
     document.body.style.overflow = open ? 'hidden' : '';
   }, [open]);
 
+  /* close drawer on route change */
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
   return (
     <>
-      <header className={`nav ${scrolled ? 'shadow' : ''}`}>
-        <div className="inner">
-          {/* left links */}
-          <nav className="d-menu">
+      <header className={`nav ${scrolled ? 'scrolled' : ''}`}>
+        <div className="bar container">
+          {/* LEFT: first two links (desktop only) */}
+          <nav className="d-menu left">
             {LINKS.slice(0, 2).map(([href, label]) => (
                 <Link key={href} href={href} className={pathname === href ? 'active' : ''}>
                   {label}
@@ -42,17 +48,17 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* logo */}
+          {/* CENTER: logo (fixed size, centered) */}
           <div className="logo">
             <Link href="/" aria-label="Home">
               <img
                   src="/images/green-sparrow-transparent.webp"
-                  alt="Green Sparrow Tattoo Co."
+                  alt="Green Sparrow Tattoo Co."
               />
             </Link>
           </div>
 
-          {/* right links + CTA */}
+          {/* RIGHT: desktop links + CTA */}
           <nav className="d-menu right">
             {LINKS.slice(2).map(([href, label]) => (
                 <Link key={href} href={href} className={pathname === href ? 'active' : ''}>
@@ -62,24 +68,25 @@ export default function Navbar() {
             <Link href="/booking" className="cta">Book Now</Link>
           </nav>
 
-          {/* mobile buttons */}
+          {/* MOBILE actions: pinned far-right at >=320px */}
           <div className="m-actions">
-            <a href="tel:+16022093099" aria-label="Call us">
-              <FiPhone size={26}/>
+            <a href="tel:+16022093099" aria-label="Call us" className="icon-btn">
+              <FiPhone className="icon" aria-hidden="true"/>
             </a>
             <button
-                className="burger"
+                className="icon-btn"
               aria-label="Toggle menu"
+                aria-expanded={open}
                 onClick={() => setOpen(o => !o)}
             >
-              {open ? <FiX size={30}/> : <FiMenu size={30}/>}
+              {open ? <FiX className="icon" aria-hidden="true"/> : <FiMenu className="icon" aria-hidden="true"/>}
             </button>
           </div>
         </div>
 
-        {/* mobile drawer */}
+        {/* MOBILE drawer (sits directly under the header height per breakpoint) */}
         <nav className={`m-drawer ${open ? 'show' : ''}`}>
-          {[...LINKS, ['/booking', 'Book Now']].map(([href, label]) => (
+          {[...LINKS, ['/booking', 'Book Now']].map(([href, label]) => (
               <Link
                   key={href}
                   href={href}
@@ -93,148 +100,129 @@ export default function Navbar() {
       </header>
 
       <style jsx>{`
-        :global(body) {
-          margin: 0;
-        }
+        :global(body) { margin: 0; }
 
-        /* NAV BAR */
+        /* ------- NAV WRAPPER ------- */
         .nav {
-          position: sticky;
-          top: 0;
-          left: 0;
-          right: 0;
-          z-index: 1000;
-          height: 118px; /* taller bar */
-          background: #1b1b1b;
-          color: #f1ede0;
-          display: flex;
+          position: sticky; top: 0; left: 0; right: 0; z-index: 1000;
+          background: var(--nav-bg);
+          color: var(--nav-link);
+          transition: background .25s ease, box-shadow .25s ease, backdrop-filter .25s ease;
+        }
+        .scrolled { box-shadow: 0 6px 18px rgba(0,0,0,.35); backdrop-filter: saturate(160%) blur(6px); }
+
+        /* ------- BAR LAYOUT ------- */
+        .bar.container {
+          /* Uses your global .container grid: 1fr auto 1fr */
+          height: 96px;                /* default (≥320px) */
+          display: grid;
+          grid-template-columns: 1fr auto 1fr; /* left | logo | right */
           align-items: center;
-          width: 100%;
+          gap: 1rem;
         }
 
-        .shadow {
-          box-shadow: 0 3px 8px rgba(0, 0, 0, .35);
-        }
+        /* Ensure all links inherit color (fix blue/purple) */
+        .nav :global(a) { color: inherit; text-decoration: none; }
 
-        .inner {
-          max-width: 1400px;
-          margin: 0 auto;
-          padding: 0 1.25rem;
-          flex: 1;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        }
+        /* ------- DESKTOP MENUS ------- */
+        .d-menu { display: none; gap: clamp(1.2rem, 2vw, 2rem); }
+        .d-menu.left { justify-self: start; }
+        .d-menu.right { justify-self: end; align-items: center; }
 
-        /* DESKTOP LINKS */
-        .d-menu {
-          display: flex;
-          gap: 2rem;
-        }
-
-        .d-menu.right {
-          align-items: center;
-        }
-
-        .d-menu a,
-        .d-menu a:visited {
-          font-family: 'Lora', serif;
+        .d-menu :global(a:any-link) {
+          font-family: var(--font-sans);
           text-transform: uppercase;
-          font-size: 17px; /* larger text */
-          color: #f1ede0;
-          text-decoration: none;
+          font-size: clamp(0.9rem, 1.1vw, 1.06rem);
+          letter-spacing: .06em;
           position: relative;
           padding: 6px 0;
+          outline: none;
         }
-
-        .d-menu a::after {
+        .d-menu :global(a:any-link)::after {
           content: '';
-          position: absolute;
-          left: 0;
-          bottom: -5px;
-          width: 100%;
-          height: 2px;
-          background: #e5948b;
-          transform: scaleX(0);
-          transition: transform .25s;
+          position: absolute; left: 0; bottom: -5px;
+          width: 100%; height: 2px; background: var(--cta-bg);
+          transform: scaleX(0); transform-origin: left;
+          transition: transform .25s ease;
         }
+        .d-menu :global(a:hover:any-link)::after,
+        .d-menu :global(a.active:any-link)::after { transform: scaleX(1); }
 
-        .d-menu a:hover::after,
-        .d-menu a.active::after {
-          transform: scaleX(1);
+        /* ------- CTA ------- */
+        .cta:any-link {
+          background: var(--cta-bg);
+          color: var(--cta-text);
+          padding: .65rem 1.4rem;
+          border-radius: 6px;
+          font-family: var(--font-sans);
+          font-weight: 700;
+          font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+          transition: filter .2s ease;
+          margin-left: .25rem;
         }
+        .cta:any-link:hover { filter: brightness(1.08); }
+        .cta:any-link:active { filter: brightness(.96); }
 
-        /* CALL‑TO‑ACTION */
-        .cta,
-        .cta:visited {
-          background: #e5948b;
-          color: #1b1b1b;
-          padding: .65rem 1.6rem; /* bolder button */
-          border-radius: 4px;
-          font-family: 'Sancreek', cursive;
-          font-size: 1.15rem;
-          text-decoration: none;
-        }
-
-        /* LOGO */
+        /* ------- LOGO (centered, fixed size on desktop) ------- */
+        .logo { justify-self: center; }
         .logo img {
-          height: 102px; /* bigger logo */
-          transition: transform .25s;
+          display: block; margin-inline: auto;
+          height: 88px; width: auto;       /* ≥320 baseline */
+          transition: transform .25s ease;
         }
+        .scrolled .logo img { transform: scale(.92); }
 
-        .shadow .logo img {
-          transform: scale(.88);
-        }
-
-        /* subtle shrink */
-
-        /* MOBILE */
+        /* ------- MOBILE ACTIONS (≥320px pinned far right) ------- */
         .m-actions {
-          display: none;
-          align-items: center;
-          gap: 1.2rem;
+          display: flex; gap: .75rem; justify-self: end; align-items: center;
         }
-
-        .burger {
-          background: none;
-          border: 0;
-          color: #f1ede0;
-          cursor: pointer;
+        /* Button visuals: same background as navbar, icons inherit nav-link color */
+        .icon-btn {
+          appearance: none; border: 0; cursor: pointer;
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 44px; height: 44px;           /* accessible tap target */
+          background: var(--nav-bg);           /* matches bar background */
+          color: var(--nav-link);              /* icon color = nav link color */
+          border-radius: 8px;
+          transition: filter .2s ease, transform .1s ease;
         }
+        .icon-btn:hover { filter: brightness(1.08); }
+        .icon-btn:active { transform: translateY(1px); }
+        .icon { width: 22px; height: 22px; display: block; }
 
+        /* ------- MOBILE DRAWER ------- */
         .m-drawer {
-          position: fixed;
-          top: 118px;
-          left: 0;
-          right: 0;
+          position: fixed; left: 0; right: 0;
+          top: 96px;                          /* matches small header height */
           background: #0e0e0e;
-          display: none;
-          flex-direction: column;
-          align-items: center;
-          padding: 2rem 0;
-          gap: 1.4rem;
+          display: none; flex-direction: column; align-items: center;
+          padding: 1.5rem 0 2rem; gap: 1.1rem;
+          border-top: 1px solid rgba(255,255,255,.08);
         }
-
-        .m-drawer.show {
-          display: flex;
-        }
-
-        .m-drawer a,
-        .m-drawer a:visited {
+        .m-drawer.show { display: flex; }
+        .m-drawer :global(a:any-link) {
           color: #fff;
-          font-family: 'Sancreek', cursive;
-          font-size: 1.7rem;
-          text-decoration: none;
+          font-family: var(--font-sans);
+          font-size: clamp(1.1rem, 4vw, 1.35rem);
+        }
+        .m-drawer :global(a.active:any-link) {
+          text-decoration: underline;
+          text-underline-offset: 4px;
+          text-decoration-color: var(--cta-bg);
         }
 
-        @media (max-width: 900px) {
-          .d-menu {
-            display: none;
-          }
-
-          .m-actions {
-            display: flex;
-          }
+        /* ------- BREAKPOINTS ------- */
+        @media (min-width: 641px) {
+          .bar.container { height: 108px; }
+          .m-drawer { top: 108px; }
+          .logo img { height: 96px; }
+        }
+        @media (min-width: 901px) {
+          .bar.container { height: 118px; }
+          .m-drawer { top: 118px; }
+          .logo img { height: 102px; }       /* your exact desktop size */
+          .d-menu { display: flex; }
+          .m-actions { display: none; }      /* hide mobile icons on desktop */
         }
       `}</style>
     </>

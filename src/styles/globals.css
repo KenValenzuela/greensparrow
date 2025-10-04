@@ -12,15 +12,15 @@
   --font-serif: 'Lora', Georgia, serif;
   --font-display: 'Sancreek', cursive;
 
-  --background: #0a0000; /* fallback while image loads */
+  --background: #7e5218; /* fallback while image loads */
   --foreground: #f4f4f4;
 
-  --nav-bg: rgba(44, 32, 22, .85);
-  --nav-link: #f1ede0;
+  --nav-bg: rgb(207, 146, 88);
+  --nav-link: #000000;
   --cta-bg: #e5948b;
   --cta-text: #1a1a1a;
-  --footer-bg: rgb(53 38 25 / .85);
-  --footer-accent: #e5948b;
+  --footer-bg: rgb(206, 145, 88);
+  --footer-accent: #000000;
 }
 
 /* ── Global layout & backdrop ─────────────────────────────── */
@@ -47,7 +47,7 @@ body::before {
   pointer-events: none;
 
   background: radial-gradient(rgba(10, 10, 10, .70), rgba(10, 10, 10, .92)),
-  url('/images/background.webp') center / cover no-repeat;
+  url('/images/oregon_background.jpg') center / cover no-repeat;
   background-attachment: fixed; /* Safari/iOS fix                         */
 }
 

@@ -55,6 +55,13 @@ const artists = [
     bio: 'Dallon Oracle is a new apprentice passionate about learning japanese and neo-traditional styles.',
     portfolio: '/artists/dallon',
   },
+  {
+    name: 'Stella',
+    role: 'Jr. Artist',
+    image: '/images/artists/stella/stella_portrait.jpg',
+    bio: 'Stella brings her background in Intermedia Art to tattooing, focusing on ornamental and bold designs while building her skills across all styles.',
+    portfolio: '/artists/stella',
+  },
 ];
 
 export default function TeamSection() {
@@ -167,7 +174,7 @@ const cardStyle = {
   alignItems: 'center',
   padding: '16px',
   borderRadius: '16px',
-    background: 'rgba(28,31,26,0.95)',
+  background: 'rgb(205,144,88)',
   border: '1px solid rgba(255,255,255,0.08)',
   boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
   cursor: 'pointer',
@@ -182,6 +189,5 @@ const imageContainerStyle = {
   height: '260px',
   borderRadius: '12px',
   overflow: 'hidden',
-  backgroundColor: '#000',
   flexShrink: 0,
 };

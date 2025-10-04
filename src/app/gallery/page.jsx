@@ -14,6 +14,7 @@ const artistImageMap = {
   Axel: ['axel_1.webp', 'axel_2.webp', 'axel_3.webp', 'axel_4.webp', 'axel_5.webp', 'axel_6.webp', 'axel_7.webp', 'axel_9.webp', 'axel_10.webp', 'axel_11.webp', 'axel_12.webp', 'axel_15.webp'],
   Dallon: ['dallon_1.webp', 'dallon_2.webp', 'dallon_3.webp', 'dallon_4.webp', 'dallon_5.webp', 'dallon_6.webp', 'dallon_7.webp', 'dallon_8.webp'],
   Mia: ['mia_1.webp', 'mia_2.webp', 'mia_3.webp', 'mia_4.webp', 'mia_5.webp', 'mia_6.webp'],
+  Stella: ['stella_1.png', 'stella_2.png', 'stella_3.png', 'stella_4.png', 'stella_5.jpg', 'stella_6.jpg', 'stella_7.png', 'stella_8.jpg', 'stella_9.png', 'stella_10.png', 'stella_11.jpg', 'stella_12.png']
 };
 
 const artists = Object.keys(artistImageMap);

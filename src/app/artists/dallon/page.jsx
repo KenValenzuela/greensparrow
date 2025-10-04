@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import {useEffect} from 'react';
 import Link from 'next/link';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
@@ -39,7 +39,7 @@ export default function ArtistPage() {
           <p style={styles.bio}>
 Dallon Oracle is a lifelong artist and current art major at Arizona State University, with a passion for oil painting and ceramics. His journey into tattooing is rooted in creating affirming experiences for trans and queer bodies—using art as a way to help others feel more at home in themselves. As an apprentice, Dallon Oracles brings a thoughtful, expressive energy to every piece and is excited to begin translating their artistic vision onto skin.          </p>
           <Link
-            href="https://www.instagram.com/ghoulmeow/"
+              href="https://www.instagram.com/irezumi.elf/"
             target="_blank"
             rel="noopener noreferrer"
             style={styles.cta}

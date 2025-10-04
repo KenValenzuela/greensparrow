@@ -9,229 +9,305 @@ export default function Footer() {
       <h2 id="footer-heading" className="sr-only">Site footer</h2>
 
       <div className="wrap">
-        {/* LEFT */}
-        <nav className="nav" aria-label="Footer navigation">
-          {[
-            ['/gallery', 'Our Work'],
-            ['/about', 'About Us'],
-            ['/booking', 'Book Now'],
-            ['/faq', 'FAQ'],
-          ].map(([href, label]) => (
-              <Link key={href} href={href}>{label}</Link>
-          ))}
+        {/* LEFT: Nav */}
+        <nav className="col nav" aria-label="Footer navigation">
+          <h3 className="hdr">Explore</h3>
+          <ul className="list">
+            {[
+              ['/gallery', 'Our Work'],
+              ['/about', 'About Us'],
+              ['/booking', 'Book Now'],
+              ['/faq', 'FAQ'],
+            ].map(([href, label]) => (
+                <li key={href}>
+                  <Link href={href} className="link">{label}</Link>
+                </li>
+            ))}
+          </ul>
         </nav>
 
-        {/* CENTER */}
-        <div className="brand">
+        {/* CENTER: Brand / CTA */}
+        <div className="col brand">
           <p className="logo">Green Sparrow Tattoo Co.</p>
-          <Link href="/booking" className="cta">Book Now →</Link>
           <p className="tag">Ready to book your next piece?</p>
+          <Link href="/booking" className="cta">Book Now →</Link>
         </div>
 
-        {/* RIGHT */}
-        <div className="contact">
-          <address>
-            <FiMapPin aria-hidden/> 430 N Dobson Rd #109<br/>
+        {/* RIGHT: Contact / Social */}
+        <div className="col contact">
+          <h3 className="hdr">Visit / Call</h3>
+          <address className="addr">
+            <FiMapPin aria-hidden className="ico"/> 430 N Dobson Rd #109<br/>
             Mesa, AZ 85201
           </address>
 
-          <Link href="tel:+16022093099" className="phone">
-            <FiPhone aria-hidden/> (602) 209‑3099
+          <Link href="tel:+16022093099" className="tel">
+            <FiPhone aria-hidden className="ico"/> (602) 209-3099
           </Link>
 
           <div className="social" aria-label="Social">
-            <Link href="https://instagram.com/greensparrowtattoo.co" target="_blank" rel="noopener"
-                  aria-label="Instagram">
-              <FiInstagram size={20}/>
-            </Link>
-            <Link href="https://facebook.com/Green-Sparrow-Tattoo-Co" target="_blank" rel="noopener"
-                  aria-label="Facebook">
-              <FiFacebook size={20}/>
-            </Link>
+            <a
+                href="https://instagram.com/greensparrowtattoo.co"
+                target="_blank"
+                rel="noopener"
+                aria-label="Instagram"
+                className="social-link"
+            >
+              <FiInstagram/>
+            </a>
+            <a
+                href="https://facebook.com/Green-Sparrow-Tattoo-Co"
+                target="_blank"
+                rel="noopener"
+                aria-label="Facebook"
+                className="social-link"
+            >
+              <FiFacebook/>
+            </a>
           </div>
 
-          <Link
+          <a
               href="https://maps.google.com/?q=Green+Sparrow+Tattoo+Co."
               target="_blank"
               rel="noopener"
               className="maps"
           >
             Open in Maps →
-          </Link>
+          </a>
         </div>
       </div>
 
-      <p className="copy">
-        © {new Date().getFullYear()} Green Sparrow Tattoo Co. All rights reserved.
-      </p>
+      <div className="legal">
+        <p className="copy">© {new Date().getFullYear()} Green Sparrow Tattoo Co. All rights reserved.</p>
+      </div>
 
       <style jsx>{`
         :global(body) {
           margin: 0;
         }
 
-        /* ===== base ===== */
+        /* ===== BASE ===== */
         .footer {
-          background: #1b1b1b;
-          color: #255130;
-          border-top: 2px solid #255130;
-          padding: 2rem 1rem 1.75rem;
-          font-family: 'Lora', serif;
+          background: var(--footer-bg, rgb(126, 82, 24));
+          color: var(--nav-link, #f1ede0);
+          border-top: 1px solid color-mix(in oklab, var(--footer-accent, #e5948b) 20%, #000);
+          padding: 2.25rem 1.25rem 0;
+          font-family: var(--font-sans, system-ui, -apple-system, Segoe UI, Roboto, sans-serif);
+          backdrop-filter: saturate(140%) blur(6px);
         }
 
-        /* mobile‑first layout */
-        .wrap {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 2rem;
-          width: 100%;
-        }
-
-        /* nav */
-        .nav {
-          display: flex;
-          flex-direction: column;
-          gap: .7rem;
-          text-transform: uppercase;
-          align-items: center;
-        }
-
-        .nav a,
-        .nav a:visited { /* prevent blue/purple */
-          font-size: .9rem;
-          color: #ffffff;
+        /* Prevent default blue/purple & unify link behavior in footer */
+        .footer :global(a) {
+          color: inherit;
           text-decoration: none;
-          transition: color .2s;
         }
 
-        .nav a:hover {
-          color: #e5948b;
+        .wrap {
+          max-width: 1200px;
+          margin-inline: auto;
+          display: grid;
+          gap: 2rem;
+          grid-template-columns: 1fr; /* mobile */
         }
 
-        /* brand */
+        /* Columns */
+        .col {
+          display: grid;
+          gap: .9rem;
+        }
+
+        .hdr {
+          margin: 0;
+          font-size: .95rem;
+          letter-spacing: .08em;
+          text-transform: uppercase;
+          color: color-mix(in oklab, var(--nav-link) 70%, #000);
+        }
+
+        /* Nav list */
+        .list {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          display: grid;
+          gap: .55rem;
+        }
+
+        .link:any-link {
+          color: color-mix(in oklab, var(--nav-link) 88%, #000);
+          font-size: .98rem;
+          transition: color .2s ease, text-underline-offset .2s ease;
+        }
+
+        .link:any-link:hover {
+          color: var(--footer-accent, #e5948b);
+          text-decoration: underline;
+          text-underline-offset: 3px;
+          text-decoration-color: var(--footer-accent, #e5948b);
+        }
+
+        .link:any-link:focus-visible {
+          outline: 2px solid var(--footer-accent, #e5948b);
+          outline-offset: 2px;
+          border-radius: 4px;
+        }
+
+        /* Brand / CTA */
         .brand {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: .65rem;
+          justify-items: center;
           text-align: center;
+          gap: .6rem;
         }
 
         .logo {
-          font-family: 'Sancreek', cursive;
-          font-size: clamp(1.7rem, 7vw, 2.1rem);
+          font-family: var(--font-display, 'Sancreek', cursive);
+          font-size: clamp(1.7rem, 6vw, 2.3rem);
           line-height: 1.05;
         }
 
-        .cta,
-        .cta:visited {
-          background: #e5948b;
-          color: #1b1b1b;
-          padding: .55rem 1.25rem;
-          border-radius: 4px;
-          font-family: 'Sancreek', cursive;
-          font-size: 1.2rem;
-          text-decoration: none;
-          transition: transform .25s;
-        }
-
-        .cta:hover {
-          transform: translateY(-3px);
-        }
-
         .tag {
-          font-size: .95rem;
-          color: #e5948b;
+          color: color-mix(in oklab, var(--nav-link) 70%, #000);
+          font-size: .98rem;
         }
 
-        /* contact block */
+        .cta:any-link {
+          margin-top: .25rem;
+          display: inline-block;
+          background: var(--footer-accent, #e5948b);
+          color: #1b1b1b;
+          padding: .6rem 1.2rem;
+          border-radius: 8px;
+          font-weight: 700;
+          transition: transform .18s ease, filter .18s ease;
+        }
+
+        .cta:any-link:hover {
+          filter: brightness(1.06);
+          transform: translateY(-1px);
+        }
+
+        .cta:any-link:active {
+          transform: translateY(0);
+        }
+
+        /* Contact */
         .contact {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: .7rem;
+          justify-items: center;
+          text-align: center;
         }
 
-        address {
+        .addr {
           font-style: normal;
           line-height: 1.35;
-          text-align: center;
-          display: flex;
-          align-items: flex-start;
-          gap: .35rem;
-          font-size: .9rem;
+          font-size: .98rem;
+          color: color-mix(in oklab, var(--nav-link) 85%, #000);
+          display: grid;
+          grid-auto-flow: column;
+          align-items: start;
+          justify-content: center;
+          gap: .4rem;
         }
 
-        .phone,
-        .phone:visited {
-          color: #e5948b;
-          text-decoration: none;
-          display: flex;
-          gap: .35rem;
+        .ico {
+          margin-top: .2rem;
+          flex: 0 0 auto;
+        }
+
+        .tel:any-link {
+          display: inline-grid;
+          grid-auto-flow: column;
+          align-items: center;
+          gap: .4rem;
+          color: var(--footer-accent, #e5948b);
+          font-weight: 600;
+          transition: opacity .2s ease;
+        }
+
+        .tel:any-link:hover {
+          opacity: .9;
         }
 
         .social {
-          display: flex;
+          display: grid;
+          grid-auto-flow: column;
           gap: .8rem;
+          margin-top: .4rem;
         }
 
-        .social a,
-        .social a:visited {
-          color: #ffffff;
+        .social-link {
+          display: grid;
+          place-items: center;
+          width: 38px;
+          height: 38px;
+          border-radius: 10px;
+          background: color-mix(in oklab, var(--footer-bg, #352619) 85%, #000);
+          color: color-mix(in oklab, var(--nav-link) 85%, #000);
+          transition: background .2s ease, color .2s ease, transform .12s ease;
         }
 
-        .social a:hover {
-          color: #e5948b;
+        .social-link:hover {
+          background: color-mix(in oklab, var(--footer-accent, #e5948b) 30%, #000);
+          color: var(--footer-accent, #e5948b);
+          transform: translateY(-1px);
         }
 
-        .maps,
-        .maps:visited {
-          color: #e5948b;
-          text-decoration: none;
-          font-size: .9rem;
+        .social-link:focus-visible {
+          outline: 2px solid var(--footer-accent, #e5948b);
+          outline-offset: 2px;
         }
 
-        /* copyright */
+        .maps:any-link {
+          margin-top: .4rem;
+          color: var(--footer-accent, #e5948b);
+          font-size: .95rem;
+          transition: text-underline-offset .2s ease;
+          text-decoration: underline;
+          text-decoration-color: var(--footer-accent, #e5948b);
+          text-underline-offset: 2px;
+        }
+
+        .maps:any-link:hover {
+          text-underline-offset: 4px;
+        }
+
+        /* Legal strip */
+        .legal {
+          margin-top: 1.8rem;
+          border-top: 1px solid color-mix(in oklab, var(--nav-link) 12%, #000);
+          padding: .9rem 0 1.2rem;
+        }
+
         .copy {
-          margin-top: 1.5rem;
+          max-width: 1200px;
+          margin: 0 auto;
           text-align: center;
-          font-size: .8rem;
-          color: #8b897f;
+          font-size: .85rem;
+          color: color-mix(in oklab, var(--nav-link) 60%, #000);
         }
 
-        /* ===== desktop ≥900 px ===== */
+        /* ===== LAYOUT ≥ 900 px ===== */
         @media (min-width: 900px) {
           .wrap {
-            flex-direction: row;
-            justify-content: space-between; /* anchor to far edges */
-            align-items: flex-start;
+            grid-template-columns: 1fr auto 1fr; /* nav | brand | contact */
+            align-items: start;
           }
 
-          .nav {
-            align-items: flex-start;
+          .brand {
+            justify-items: center;
+            text-align: center;
           }
 
           .contact {
-            align-items: flex-end;
+            justify-items: end;
             text-align: right;
           }
 
-          address {
-            text-align: right;
-            justify-content: flex-end;
-          }
-
-          .logo {
-            font-size: 2.4rem;
-          }
-
-          .cta {
-            font-size: 1.4rem;
+          .addr {
+            justify-content: end;
           }
         }
 
-        /* screen‑reader helper */
+        /* Screen-reader helper */
         .sr-only {
           position: absolute;
           width: 1px;
