@@ -1,8 +1,18 @@
 'use client';
 
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {useRouter} from 'next/navigation';
 import toast from 'react-hot-toast';
+
+/* ====================== BOOKING FORM (Customer select fixed) ======================
+ * - Customer select now styled via data-attribute + class, with :has() CSS fallback.
+ * - Compact calendar (no end-time input), strong spacing, non-overlapping fields.
+ * - Error banner shows only after a submit attempt.
+ * - Press-motion micro-interactions on buttons/chips.
+ * - Stella added; Axel included; “Piercing” style present.
+ * - Payload unchanged; no TypeScript.
+ * ================================================================================
+ */
 
 const initial = {
     name: '',
@@ -11,7 +21,7 @@ const initial = {
     preferred_artist: '',
     first_available: false,
     appointment_date: '',
-    appointment_end: '',
+    appointment_end: '',       // kept for API compatibility (no UI)
     placement: '',
     preferred_style: [],
     customer_type: 'New',
@@ -19,27 +29,150 @@ const initial = {
     images: [],
 };
 
-const ARTISTS = ['Joe', 'Mickey', 'T', 'Mia', 'Ki', 'Axel'];
-const STYLES = ['Black & Grey', 'Traditional', 'Neo-traditional', 'Fine Line', 'Color'];
+const ARTISTS = ['Joe', 'Mickey', 'T', 'Mia', 'Ki', 'Axel', 'Stella'];
+const STYLES = ['Black & Grey', 'Traditional', 'Neo-traditional', 'Fine Line', 'Color', 'Piercing'];
+
+/* -------------------- Press motion -------------------- */
+function usePressMotion({dx = 3, dy = -3, scale = 0.985, impulseMs = 120} = {}) {
+    const [pressed, setPressed] = useState(false);
+    const press = () => {
+        setPressed(true);
+        clearTimeout(press._t);
+        press._t = setTimeout(() => setPressed(false), impulseMs);
+    };
+    return {
+        style: pressed ? {transform: `translate(${dx}px, ${dy}px) scale(${scale})`} : undefined,
+        handlers: {
+            onPointerDown: (e) => {
+                if (e.pointerType !== 'mouse' || e.button === 0) press();
+            },
+            onPointerUp: () => setPressed(false),
+            onPointerCancel: () => setPressed(false),
+            onKeyDown: (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    press();
+                }
+            },
+            onKeyUp: () => setPressed(false),
+        },
+    };
+}
+
+function Pressable({children, motion = 'diag', scale = 0.985, className = '', as = 'button', ...rest}) {
+    const map = {
+        right: {dx: 3, dy: 0},
+        left: {dx: -3, dy: 0},
+        up: {dx: 0, dy: -3},
+        down: {dx: 0, dy: 3},
+        diag: {dx: 3, dy: -3}
+    };
+    const preset = typeof motion === 'string' ? (map[motion] || map.diag) : motion;
+    const {style, handlers} = usePressMotion({...preset, scale});
+    const Comp = as;
+    return (
+        <Comp {...rest} {...handlers} style={style}
+              className={`transition-transform duration-150 will-change-transform ${className}`}>
+            {children}
+        </Comp>
+    );
+}
+
+/* ----------------------- Calendar ----------------------- */
+function startOfMonth(date) {
+    return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+function endOfMonth(date) {
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0);
+}
+
+function addMonths(date, n) {
+    return new Date(date.getFullYear(), date.getMonth() + n, 1);
+}
+
+function fmtISO(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${dd}`;
+}
+
+function isBeforeTodayISO(iso) {
+    const t = new Date();
+    t.setHours(0, 0, 0, 0);
+    const x = new Date(iso);
+    x.setHours(0, 0, 0, 0);
+    return x < t;
+}
+
+function Calendar({valueISO, onChange}) {
+    const [cursor, setCursor] = useState(() => startOfMonth(new Date()));
+    const monthLabel = cursor.toLocaleString(undefined, {month: 'long', year: 'numeric'});
+
+    const cells = useMemo(() => {
+        const start = startOfMonth(cursor);
+        const end = endOfMonth(cursor);
+        const startDay = (start.getDay() + 6) % 7; // Mon=0
+        const arr = [];
+        for (let i = 0; i < startDay; i++) arr.push(null);
+        for (let d = 1; d <= end.getDate(); d++) arr.push(fmtISO(new Date(cursor.getFullYear(), cursor.getMonth(), d)));
+        while (arr.length % 7) arr.push(null);
+        return arr;
+    }, [cursor]);
+
+    const select = (iso) => {
+        if (!iso || isBeforeTodayISO(iso)) return;
+        onChange(iso);
+    };
+
+    return (
+        <div className="calendar">
+            <div className="calendar__header">
+                <Pressable as="button" type="button" motion="left" className="calendar__nav"
+                           onClick={() => setCursor(m => addMonths(m, -1))} aria-label="Previous month">‹</Pressable>
+                <div className="calendar__label">{monthLabel}</div>
+                <Pressable as="button" type="button" motion="right" className="calendar__nav"
+                           onClick={() => setCursor(m => addMonths(m, 1))} aria-label="Next month">›</Pressable>
+            </div>
+            <div className="calendar__weekdays">
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => <div key={d}>{d}</div>)}
+            </div>
+            <div className="calendar__grid">
+                {cells.map((iso, i) => {
+                    const disabled = !iso || isBeforeTodayISO(iso);
+                    const selected = !!iso && iso === valueISO;
+                    return (
+                        <button
+                            key={i}
+                            type="button"
+                            disabled={disabled}
+                            onClick={() => select(iso)}
+                            className={`calendar__day ${disabled ? 'is-disabled' : ''} ${selected ? 'is-selected' : ''}`}
+                            data-selected={selected ? 'true' : 'false'}
+                            aria-pressed={selected || undefined}
+                        >
+                            {iso ? Number(iso.slice(-2)) : ''}
+                        </button>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
+/* ============================== Main ============================== */
 
 export default function BookingForm() {
     const router = useRouter();
     const [form, setForm] = useState(initial);
     const [busy, setBusy] = useState(false);
     const [err, setErr] = useState('');
+    const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
     const set = (k, v) => setForm(prev => ({...prev, [k]: v}));
 
-    const onStyleToggle = (val) => {
-        setForm(prev => {
-            const has = prev.preferred_style.includes(val);
-            return {
-                ...prev,
-                preferred_style: has ? prev.preferred_style.filter(s => s !== val) : [...prev.preferred_style, val]
-            };
-        });
-    };
-
+    // Draft persistence
     useEffect(() => {
         try {
             const saved = localStorage.getItem('booking_draft');
@@ -54,12 +187,66 @@ export default function BookingForm() {
         }
     }, [form]);
 
+    // Progress meter (visual only)
+    const progress = useMemo(() => {
+        const req = [
+            Boolean(form.name),
+            Boolean(form.email),
+            Boolean(form.message),
+            Boolean(form.appointment_date),
+            form.first_available || Boolean(form.preferred_artist),
+        ].filter(Boolean).length;
+        return Math.max(10, (req / 5) * 100);
+    }, [form]);
+
+    // Uploader (data URLs)
+    const dropRef = useRef(null);
+    const toDataUrl = (file) => new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(String(r.result));
+        r.onerror = reject;
+        r.readAsDataURL(file);
+    });
+
+    async function handleFiles(files) {
+        const list = Array.from(files || []);
+        if (!list.length) return;
+        try {
+            const urls = await Promise.all(list.map(toDataUrl));
+            set('images', [...form.images, ...urls].slice(0, 8));
+        } catch {
+            toast.error('Could not read one of the files.');
+        }
+    }
+
+    const onDrop = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const files = e.dataTransfer?.files;
+        if (files?.length) await handleFiles(files);
+    };
+    const onPaste = async (e) => {
+        const items = e.clipboardData?.items || [];
+        const files = Array.from(items).filter(i => i.kind === 'file').map(i => i.getAsFile()).filter(Boolean);
+        if (files.length) await handleFiles(files);
+    };
+    useEffect(() => {
+        const node = dropRef.current;
+        if (!node) return;
+        const prevent = (evt) => {
+            evt.preventDefault();
+            evt.stopPropagation();
+        };
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(ev => node.addEventListener(ev, prevent));
+        return () => ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(ev => node.removeEventListener(ev, prevent));
+    }, []);
+    const removeImage = (i) => set('images', form.images.filter((_, idx) => idx !== i));
+
+    // Submit
     async function handleSubmit(e) {
         e.preventDefault();
-        setErr('');
-
-        // Client-side checks for better UX
-        if (!form.name || !form.email || !form.message || !form.appointment_date) {
+        setAttemptedSubmit(true);
+        if (!form.name || !form.email || !/.+@.+\..+/.test(form.email) || !form.message || !form.appointment_date) {
             setErr('Please complete all required fields.');
             return;
         }
@@ -67,17 +254,15 @@ export default function BookingForm() {
             setErr('Select an artist or choose “First available”.');
             return;
         }
-
         setBusy(true);
         toast.loading('Submitting…', {id: 'book'});
         try {
             const res = await fetch('/api/book', {
                 method: 'POST',
                 headers: {'content-type': 'application/json'},
-                body: JSON.stringify(form),
+                body: JSON.stringify(form)
             });
             const data = await res.json().catch(() => ({}));
-
             if (!res.ok || data?.ok === false) {
                 const detail = data?.error || `Submit failed (${res.status})`;
                 setErr(detail);
@@ -85,7 +270,6 @@ export default function BookingForm() {
                 setBusy(false);
                 return;
             }
-
             toast.success('Request sent!', {id: 'book'});
             setForm(initial);
             try {
@@ -102,213 +286,206 @@ export default function BookingForm() {
         }
     }
 
+    const inputBase =
+        'w-full rounded-[var(--field-radius)] border border-[var(--hairline)] bg-[var(--field-surface)] ' +
+        'px-[var(--field-pad-x)] py-[var(--field-pad-y)] text-[var(--field-fg)] placeholder-white/50 ' +
+        'outline-none focus:border-[var(--cta-bg)] focus:ring-0';
+
     return (
-        <form onSubmit={handleSubmit} className="mx-auto grid gap-6">
-            {/* Card: Heading / context */}
-            <div className="mx-auto w-full max-w-2xl rounded-xl border border-white/10 bg-white/5 p-5 backdrop-blur">
-                <h2 className="mb-1 font-serif text-2xl text-[#F1EDE0]">Book an appointment</h2>
-                <p className="text-sm text-white/70">Typical reply time: 1–2 business days.</p>
-
-                {err && (
-                    <div
-                        role="alert"
-                        className="mt-4 rounded-md border border-red-400/40 bg-red-500/10 px-3 py-2 text-sm text-red-200"
-                    >
-                        <strong className="block">Could not submit</strong>
-                        <span className="opacity-90">{err}</span>
-                    </div>
-                )}
-
-                {/* Grid: contact + placement */}
-                <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                    <Field label="Name" required>
-                        <input
-                            className="input"
-                            value={form.name}
-                            onChange={e => set('name', e.target.value)}
-                            aria-invalid={!form.name ? 'true' : 'false'}
-                        />
-                    </Field>
-                    <Field label="Email" required>
-                        <input
-                            className="input"
-                            type="email"
-                            value={form.email}
-                            onChange={e => set('email', e.target.value)}
-                            aria-invalid={!form.email ? 'true' : 'false'}
-                        />
-                    </Field>
-                    <Field label="Phone">
-                        <input className="input" value={form.phone} onChange={e => set('phone', e.target.value)}/>
-                    </Field>
-                    <Field label="Placement">
-                        <input className="input" value={form.placement} onChange={e => set('placement', e.target.value)}
-                               placeholder="e.g., left forearm"/>
-                    </Field>
-                </div>
-
-                {/* Grid: dates */}
-                <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                    <Field label="Preferred date" required>
-                        <input
-                            className="input"
-                            type="date"
-                            value={form.appointment_date}
-                            onChange={e => set('appointment_date', e.target.value)}
-                            aria-invalid={!form.appointment_date ? 'true' : 'false'}
-                        />
-                    </Field>
-                    <Field label="End time (optional)">
-                        <input
-                            className="input"
-                            type="time"
-                            value={form.appointment_end}
-                            onChange={e => set('appointment_end', e.target.value)}
-                        />
-                    </Field>
-                </div>
-
-                {/* Artist section */}
-                <fieldset className="mt-4 rounded-lg border border-white/10 p-3">
-                    <legend className="px-1 text-sm text-white/80">Artist</legend>
-
-                    <label className="mb-2 inline-flex cursor-pointer items-center gap-2 text-white/90">
-                        <input
-                            type="checkbox"
-                            className="h-4 w-4 accent-[#2a8f5c]"
-                            checked={form.first_available}
-                            onChange={e => set('first_available', e.target.checked)}
-                        />
-                        First available
-                    </label>
-
-                    <div className="mt-2 flex flex-wrap gap-2">
-                        {ARTISTS.map(a => {
-                            const active = !form.first_available && form.preferred_artist === a;
-                            return (
-                                <button
-                                    key={a}
-                                    type="button"
-                                    onClick={() => set('preferred_artist', active ? '' : a)}
-                                    disabled={form.first_available}
-                                    className={[
-                                        'rounded-full border px-3 py-1 text-sm transition',
-                                        form.first_available
-                                            ? 'cursor-not-allowed border-white/10 text-white/30'
-                                            : active
-                                                ? 'border-[#2a8f5c]/70 bg-[#2a8f5c]/20 text-white'
-                                                : 'border-white/15 text-white/80 hover:border-white/30',
-                                    ].join(' ')}
-                                    aria-pressed={active}
-                                >
-                                    {a}
-                                </button>
-                            );
-                        })}
-                    </div>
-                </fieldset>
-
-                {/* Styles section */}
-                <fieldset className="mt-4 rounded-lg border border-white/10 p-3">
-                    <legend className="px-1 text-sm text-white/80">Styles</legend>
-                    <div className="flex flex-wrap gap-2">
-                        {STYLES.map(s => {
-                            const on = form.preferred_style.includes(s);
-                            return (
-                                <button
-                                    key={s}
-                                    type="button"
-                                    onClick={() => onStyleToggle(s)}
-                                    className={[
-                                        'rounded-full border px-3 py-1 text-sm transition',
-                                        on
-                                            ? 'border-[#e5948b]/70 bg-[#e5948b]/20 text-white'
-                                            : 'border-white/15 text-white/80 hover:border-white/30',
-                                    ].join(' ')}
-                                    aria-pressed={on}
-                                >
-                                    {s}
-                                </button>
-                            );
-                        })}
-                    </div>
-                </fieldset>
-
-                {/* Message */}
-                <Field className="mt-4" label="Describe your idea" required>
-          <textarea
-              className="input min-h-[120px]"
-              value={form.message}
-              onChange={e => set('message', e.target.value)}
-              aria-invalid={!form.message ? 'true' : 'false'}
-              placeholder="Size, placement, reference details…"
-          />
-                </Field>
-
-                {/* Footer row */}
-                <div className="mt-4 flex items-center justify-between gap-3">
-                    <select
-                        className="input max-w-[220px]"
-                        value={form.customer_type}
-                        onChange={e => set('customer_type', e.target.value)}
-                    >
-                        <option>New</option>
-                        <option>Returning</option>
-                    </select>
-
-                    <div className="flex items-center gap-2">
-                        <a href="tel:+16022093099"
-                           className="rounded-md border border-white/15 px-3 py-2 text-white/80 hover:border-white/30">Call
-                            the
-                            shop</a>
-                        <button
-                            type="submit"
-                            disabled={busy}
-                            className="inline-flex items-center gap-2 rounded-md border border-[#2a8f5c]/60 bg-[#2a8f5c]/30 px-4 py-2 text-white transition disabled:opacity-60"
-                        >
-                            {busy && <Spinner/>}
-                            {busy ? 'Submitting…' : 'Submit request'}
-                        </button>
+        <div className="relative booking-surface">
+            {/* Sticky header with progress */}
+            <div
+                className="sticky top-0 z-30 border-b border-[var(--hairline)] backdrop-blur supports-[backdrop-filter]:bg-black/30">
+                <div className="mx-auto max-w-3xl px-[var(--container-pad-x)] py-[var(--container-pad-y)]">
+                    <div className="flex items-center justify-between gap-[var(--gap-lg)]">
+                        <div className="leading-tight">
+                            <h2 className="font-serif text-[1.15rem] text-[#F1EDE0]">Book an appointment</h2>
+                            <p className="text-xs text-white/70">Typical reply time: 1–2 business days.</p>
+                        </div>
+                        <div className="hidden sm:flex w-44 items-center gap-2">
+                            <div className="h-2 w-full overflow-hidden rounded-full bg-white/10" aria-hidden="true">
+                                <div className="h-2 rounded-full"
+                                     style={{width: `${Math.round(progress)}%`, backgroundColor: 'var(--cta-bg)'}}/>
+                            </div>
+                            <span className="min-w-10 text-right text-xs text-white/70">{Math.round(progress)}%</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* tiny style shim for inputs if you aren’t using a Tailwind plugin */}
-            <style jsx>{`
-                .input {
-                    padding: 0.6rem 0.75rem;
-                    border: 1px solid rgba(241, 237, 224, 0.14);
-                    background: rgba(255, 255, 255, 0.05);
-                    border-radius: 8px;
-                    color: #f4f4f4;
-                    outline: none;
-                    width: 100%;
-                }
+            <form onSubmit={handleSubmit}
+                  className="mx-auto grid gap-[var(--block-gap)] px-[var(--container-pad-x)] pb-32 pt-[var(--container-pad-y)] sm:pb-[var(--container-pad-y)]"
+                  noValidate>
+                <div className="booking-card">
+                    {attemptedSubmit && err && (
+                        <div role="alert"
+                             className="mb-[var(--block-gap)] rounded-[var(--field-radius)] border border-rose-400/40 bg-rose-500/10 px-[var(--pad)] py-[var(--pad-sm)] text-sm text-rose-200">
+                            <strong className="block">Could not submit</strong>
+                            <span className="opacity-90">{err}</span>
+                        </div>
+                    )}
 
-                .input:focus {
-                    border-color: #e5948b;
-                }
-            `}</style>
-        </form>
+                    {/* Customer select — now with robust color logic */}
+                    <label className="field">
+                        <span className="field-label">Customer</span>
+                        <select
+                            name="customer_type"
+                            value={form.customer_type}
+                            onChange={e => set('customer_type', e.target.value)}
+                            // BOTH a class toggle and a data attribute (belt & suspenders)
+                            className={`input-base select-vis select-variant ${form.customer_type === 'Returning' ? 'is-returning' : 'is-new'}`}
+                            data-customer={form.customer_type === 'Returning' ? 'returning' : 'new'}
+                        >
+                            {/* explicit value attributes for reliable CSS targeting */}
+                            <option value="New">New</option>
+                            <option value="Returning">Returning</option>
+                        </select>
+                    </label>
+
+                    {/* Contact */}
+                    <div className="form-grid">
+                        <Field label="Name" required><input className={inputBase} value={form.name}
+                                                            onChange={e => set('name', e.target.value)}
+                                                            autoComplete="name"/></Field>
+                        <Field label="Email" required><input className={inputBase} type="email" value={form.email}
+                                                             onChange={e => set('email', e.target.value)}
+                                                             autoComplete="email" inputMode="email"/></Field>
+                        <Field label="Phone"><input className={inputBase} value={form.phone}
+                                                    onChange={e => set('phone', e.target.value)} inputMode="tel"
+                                                    autoComplete="tel"/></Field>
+                        <Field label="Placement"><input className={inputBase} value={form.placement}
+                                                        onChange={e => set('placement', e.target.value)}
+                                                        placeholder="e.g., left forearm"/></Field>
+                    </div>
+
+                    <hr className="section-divider"/>
+
+                    {/* Date (calendar) */}
+                    <label className="field">
+                        <span className="field-label">Preferred date <span className="text-white/60">*</span></span>
+                        <Calendar valueISO={form.appointment_date} onChange={(iso) => set('appointment_date', iso)}/>
+                    </label>
+
+                    {/* Artist */}
+                    <fieldset className="fieldset fieldset--spacious">
+                        <legend className="fieldset-legend">Artist</legend>
+                        <label className="inline-flex cursor-pointer items-center gap-2 text-white/90 mb-2">
+                            <input type="checkbox" className="h-4 w-4 accent-[var(--cta-bg)]"
+                                   checked={form.first_available}
+                                   onChange={e => set('first_available', e.target.checked)}/>
+                            First available
+                        </label>
+                        <div className="chips">
+                            {ARTISTS.map(a => {
+                                const active = !form.first_available && form.preferred_artist === a;
+                                return (
+                                    <Chip
+                                        key={a}
+                                        label={a}
+                                        active={active}
+                                        disabled={form.first_available}
+                                        onClick={() => set('preferred_artist', active ? '' : a)}
+                                    />
+                                );
+                            })}
+                        </div>
+                    </fieldset>
+
+                    {/* Styles (includes “Piercing”) */}
+                    <fieldset className="fieldset fieldset--spacious">
+                        <legend className="fieldset-legend">Styles</legend>
+                        <div className="chips">
+                            {STYLES.map(s => {
+                                const on = form.preferred_style.includes(s);
+                                return (
+                                    <Chip
+                                        key={s}
+                                        label={s}
+                                        active={on}
+                                        onClick={() =>
+                                            set('preferred_style', on ? form.preferred_style.filter(v => v !== s) : [...form.preferred_style, s])
+                                        }
+                                    />
+                                );
+                            })}
+                        </div>
+                    </fieldset>
+
+                    {/* Message */}
+                    <label className="field">
+                        <span className="field-label">Describe your idea <span className="text-white/60">*</span></span>
+                        <textarea className={`${inputBase} min-h-[140px]`} value={form.message}
+                                  onChange={e => set('message', e.target.value)}
+                                  placeholder="Size, placement, references…" maxLength={1200}/>
+                    </label>
+
+                    {/* Uploader */}
+                    <section className="field">
+                        <span className="field-label">Upload reference images (optional)</span>
+                        <div ref={dropRef} onDrop={onDrop} className="uploader">
+                            <div className="uploader-inner">
+                                <input id="file" type="file" accept="image/*" multiple className="hidden"
+                                       onChange={(e) => e.target.files && handleFiles(e.target.files)}/>
+                                <Pressable as="label" htmlFor="file" className="btn-ghost">Browse files</Pressable>
+                                <p className="text-xs text-white/80">…or drag &amp; drop images here (up to 8). You can
+                                    also paste screenshots.</p>
+                            </div>
+                            {!!form.images.length && (
+                                <ul className="thumbs">
+                                    {form.images.map((src, i) => (
+                                        <li key={i} className="thumb">
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img src={src} alt={`Reference ${i + 1}`} className="thumb-img"/>
+                                            <Pressable as="button" type="button" onClick={() => removeImage(i)}
+                                                       className="thumb-remove">Remove</Pressable>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                    </section>
+
+                    {/* Actions */}
+                    <div className="footer-actions">
+                        <Pressable as="a" href="tel:+16022093099" className="btn-ghost btn-ghost--solid">Call the
+                            shop</Pressable>
+                        <Pressable as="button" type="submit" className="btn-primary" disabled={busy}>
+                            {busy ? 'Submitting…' : 'Submit request'}
+                        </Pressable>
+                    </div>
+                </div>
+            </form>
+        </div>
     );
 }
 
+/* ---------------- Subcomponents ---------------- */
 function Field({label, required, children, className = ''}) {
     return (
-        <label className={`grid gap-1 ${className}`}>
-      <span className="text-white/90">
-        {label} {required && <span className="text-white/60">*</span>}
-      </span>
+        <label className={`field ${className}`}>
+            <span className="field-label">{label}{required && <span className="text-white/60"> *</span>}</span>
             {children}
         </label>
     );
 }
 
-function Spinner() {
+function Chip({label, active, onClick, disabled}) {
     return (
-        <span
-            className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"
-            aria-hidden="true"
-        />
+        <Pressable
+            as="button"
+            type="button"
+            onClick={onClick}
+            disabled={disabled}
+            className={[
+                'rounded-full px-[var(--chip-pad-x)] py-[var(--chip-pad-y)] text-sm select-none',
+                disabled
+                    ? 'cursor-not-allowed border border-[var(--hairline)] text-white/35'
+                    : active
+                        ? 'chip-selected'
+                        : 'border border-[var(--hairline)] text-white/90 hover:border-white/50 hover:text-white',
+            ].join(' ')}
+        >
+            {label}
+        </Pressable>
     );
 }
