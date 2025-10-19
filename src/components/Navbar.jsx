@@ -1,3 +1,4 @@
+// src/components/Navbar.jsx
 'use client';
 
 import {useEffect, useState} from 'react';
@@ -68,7 +69,7 @@ export default function Navbar() {
             <Link href="/booking" className="cta">Book Now</Link>
           </nav>
 
-          {/* MOBILE actions: pinned far-right at >=320px */}
+          {/* MOBILE actions: pinned to the far-right edge */}
           <div className="m-actions">
             <a href="tel:+16022093099" aria-label="Call us" className="icon-btn">
               <FiPhone className="icon" aria-hidden="true"/>
@@ -104,21 +105,31 @@ export default function Navbar() {
 
         /* ------- NAV WRAPPER ------- */
         .nav {
-          position: sticky; top: 0; left: 0; right: 0; z-index: 1000;
+          position: sticky;
+          top: 0;
+          left: 0;
+          right: 0;
+          z-index: 1000;
           background: var(--nav-bg);
           color: var(--nav-link);
           transition: background .25s ease, box-shadow .25s ease, backdrop-filter .25s ease;
         }
-        .scrolled { box-shadow: 0 6px 18px rgba(0,0,0,.35); backdrop-filter: saturate(160%) blur(6px); }
+
+        .scrolled {
+          box-shadow: 0 6px 18px rgba(0, 0, 0, .35);
+          backdrop-filter: saturate(160%) blur(6px);
+        }
 
         /* ------- BAR LAYOUT ------- */
         .bar.container {
           /* Uses your global .container grid: 1fr auto 1fr */
-          height: 96px;                /* default (≥320px) */
+          height: 96px; /* default (≥320px) */
           display: grid;
           grid-template-columns: 1fr auto 1fr; /* left | logo | right */
           align-items: center;
           gap: 1rem;
+
+          position: relative; /* NEW: allows .m-actions to be pinned to the edge */
         }
 
         /* Ensure all links inherit color (fix blue/purple) */
@@ -167,22 +178,32 @@ export default function Navbar() {
         .logo { justify-self: center; }
         .logo img {
           display: block; margin-inline: auto;
-          height: 88px; width: auto;       /* ≥320 baseline */
+          height: 88px;
+          width: auto; /* ≥320 baseline */
           transition: transform .25s ease;
         }
         .scrolled .logo img { transform: scale(.92); }
 
-        /* ------- MOBILE ACTIONS (≥320px pinned far right) ------- */
+        /* ------- MOBILE ACTIONS (pin to far-right edge) ------- */
         .m-actions {
-          display: flex; gap: .75rem; justify-self: end; align-items: center;
+          display: flex;
+          gap: .75rem;
+          align-items: center;
+
+          position: absolute; /* NEW: detach from grid cell */
+          right: 12px; /* NEW: pin to right edge */
+          top: 50%;
+          transform: translateY(-50%); /* NEW: vertical centering */
         }
-        /* Button visuals: same background as navbar, icons inherit nav-link color */
+
+        /* Button visuals */
         .icon-btn {
           appearance: none; border: 0; cursor: pointer;
           display: inline-flex; align-items: center; justify-content: center;
-          width: 44px; height: 44px;           /* accessible tap target */
-          background: var(--nav-bg);           /* matches bar background */
-          color: var(--nav-link);              /* icon color = nav link color */
+          width: 44px;
+          height: 44px; /* accessible tap target */
+          background: var(--nav-bg); /* matches bar background */
+          color: var(--nav-link); /* icon color = nav link color */
           border-radius: 8px;
           transition: filter .2s ease, transform .1s ease;
         }
@@ -193,13 +214,14 @@ export default function Navbar() {
         /* ------- MOBILE DRAWER ------- */
         .m-drawer {
           position: fixed; left: 0; right: 0;
-          top: 96px;                          /* matches small header height */
-          background: #0e0e0e;
+          top: 96px; /* matches small header height */
+          background: #ce9158;
           display: none; flex-direction: column; align-items: center;
           padding: 1.5rem 0 2rem; gap: 1.1rem;
-          border-top: 1px solid rgba(255,255,255,.08);
+          border-top: 1px solid rgba(255, 255, 255, .08);
         }
         .m-drawer.show { display: flex; }
+
         .m-drawer :global(a:any-link) {
           color: #fff;
           font-family: var(--font-sans);
@@ -217,12 +239,23 @@ export default function Navbar() {
           .m-drawer { top: 108px; }
           .logo img { height: 96px; }
         }
+
         @media (min-width: 901px) {
           .bar.container { height: 118px; }
           .m-drawer { top: 118px; }
-          .logo img { height: 102px; }       /* your exact desktop size */
+
+          .logo img {
+            height: 102px;
+          }
+
+          /* your exact desktop size */
           .d-menu { display: flex; }
-          .m-actions { display: none; }      /* hide mobile icons on desktop */
+
+          .m-actions {
+            display: none;
+          }
+
+          /* hide mobile icons on desktop */
         }
       `}</style>
     </>
