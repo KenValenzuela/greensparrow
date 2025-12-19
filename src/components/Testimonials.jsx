@@ -35,13 +35,6 @@ const REVIEWS = [
     artists: ['T']
   },
   {
-    author: 'Tanisha Moore-Henry',
-    rating: 5,
-    when: '5 months ago',
-    text: 'Joe is light-handed, detail-oriented, and checks in often. He’s done two pieces for me so far. I’ll be back for more.',
-    artists: ['Joe']
-  },
-  {
     author: 'Paige Brayer',
     rating: 5,
     when: '2 months ago',

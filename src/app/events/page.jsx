@@ -30,9 +30,8 @@ export default function EventsPage() {
     }
   }, []);
 
-    const flyerImages = ['1.webp', '2.webp', '3.webp', '4.webp'];
+  const flyerImages = ['1.webp', '2.webp', '3.webp', '4.webp'];
   const artistLinks = [
-    { name: 'Joe', url: 'https://www.instagram.com/joseffdubbe_tattoo/' },
     { name: 'Mickey', url: 'https://www.instagram.com/cyber_dreamcore/' },
     { name: 'T', url: 'https://www.instagram.com/_.t._money/' },
     { name: 'Mia', url: 'https://www.instagram.com/miachristattoo/' },
