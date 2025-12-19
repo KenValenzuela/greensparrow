@@ -7,13 +7,6 @@ import {motion} from 'framer-motion';
 
 const artists = [
   {
-    name: 'Joe',
-    role: 'Black and Grey Realism',
-      image: '/images/artists/joe/joe_portrait.webp',
-    bio: 'Joe specializes in black and grey realism with fine detail and depth.',
-    portfolio: '/artists/joe',
-  },
-  {
     name: 'Micky',
     role: 'Cyber Sigilism',
       image: '/images/artists/mickey/mickey_portrait.webp',

@@ -29,7 +29,7 @@ const initial = {
     images: [],
 };
 
-const ARTISTS = ['Joe', 'Mickey', 'T', 'Mia', 'Ki', 'Axel', 'Stella'];
+const ARTISTS = ['Mickey', 'T', 'Mia', 'Ki', 'Axel', 'Stella'];
 const STYLES = ['Black & Grey', 'Traditional', 'Neo-traditional', 'Fine Line', 'Color', 'Piercing'];
 
 /* -------------------- Press motion -------------------- */

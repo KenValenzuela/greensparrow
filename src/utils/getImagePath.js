@@ -1,15 +1,15 @@
 /**
  * Build a public URL for any image.
  *
- * ─ artist      eg. 'Joe'  (leave blank for non‑artist assets)
- * ─ filename    original name eg. 'joe_1.jpg'
+ * ─ artist      eg. 'Mia'  (leave blank for non‑artist assets)
+ * ─ filename    original name eg. 'mia_1.jpg'
  * ─ folder      sub‑folder under the artist dir (default 'work')
  * ─ opts.webp   true  → use /public + .webp   ← default
  *               false → keep original folder + suffix
  *
  * Examples
- *   getImagePath({artist:'Joe',filename:'joe_1.jpg'})
- *     ➜ /public/images/artists/joe/work/joe_1.webp
+ *   getImagePath({artist:'mia',filename:'mia_1.jpg'})
+ *     ➜ /public/images/artists/mia/work/mia_1.webp
  *
  *   getImagePath({filename:'background.png', folder:'' , webp:false})
  *     ➜ /images/background.png

@@ -7,7 +7,6 @@ import ensureTurn from '@/lib/ensureTurn';
 
 // Artist image source map
 const artistImageMap = {
-  Joe: ['joe_1.webp', 'joe_2.webp', 'joe_3.webp', 'joe_4.webp', 'joe_5.webp', 'joe_6.webp', 'joe_7.webp', 'joe_8.webp', 'joe_9.webp', 'joe_10.webp'],
   Mickey: ['mickey_1.webp', 'mickey_2.webp', 'mickey_3.webp', 'mickey_4.webp', 'mickey_6.webp', 'mickey_7.webp', 'mickey_8.webp', 'mickey_9.webp', 'mickey_10.webp', 'mickey_11.webp', 'mickey_12.webp', 'mickey_13.webp'],
   T: ['t_1.webp', 't_2.webp', 't_3.webp', 't_4.webp', 't_5.webp', 't_6.webp', 't_7.webp', 't_8.webp', 't_9.webp', 't_10.webp', 't_11.webp', 't_12.webp', 't_13.webp', 't_14.webp', 't_15.webp', 't_16.webp', 't_17.webp', 't_18.webp'],
   Ki: ['ki_1.webp', 'ki_2.webp', 'ki_3.webp', 'ki_4.webp', 'ki_5.webp', 'ki_6.webp', 'ki_7.webp', 'ki_8.webp', 'ki_9.webp', 'ki_10.webp', 'ki_11.webp', 'ki_12.webp', 'ki_13.webp', 'ki_14.webp', 'ki_15.webp', 'ki_16.webp', 'ki_17.webp'],
