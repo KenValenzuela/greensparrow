@@ -9,7 +9,6 @@ import toast from 'react-hot-toast';
  * - Compact calendar (no end-time input), strong spacing, non-overlapping fields.
  * - Error banner shows only after a submit attempt.
  * - Press-motion micro-interactions on buttons/chips.
- * - Stella added; Axel included; “Piercing” style present.
  * - Payload unchanged; no TypeScript.
  * ================================================================================
  */
@@ -29,8 +28,8 @@ const initial = {
     images: [],
 };
 
-const ARTISTS = ['Mickey', 'T', 'Mia', 'Ki', 'Axel', 'Stella'];
-const STYLES = ['Black & Grey', 'Traditional', 'Neo-traditional', 'Fine Line', 'Color', 'Piercing'];
+const ARTISTS = ['Mickey', 'T', 'Mia', 'Ki', 'Stella'];
+const STYLES = ['Black & Grey', 'Traditional', 'Neo-traditional', 'Fine Line', 'Color'];
 
 /* -------------------- Press motion -------------------- */
 function usePressMotion({dx = 3, dy = -3, scale = 0.985, impulseMs = 120} = {}) {

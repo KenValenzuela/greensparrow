@@ -35,13 +35,6 @@ const artists = [
     portfolio: '/artists/ki',
   },
   {
-    name: 'Axel',
-    role: 'Piercer',
-      image: '/images/artists/axel/axel_portrait.webp',
-    bio: 'Axel is our studio piercer, known for a gentle approach and precise placement.',
-    portfolio: '/artists/axel',
-  },
-  {
     name: 'Dallon Oracle',
     role: 'Apprentice',
       image: '/images/artists/dallon/dallon_portrait.webp',

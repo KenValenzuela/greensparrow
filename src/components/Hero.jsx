@@ -117,7 +117,7 @@ export default function Hero() {
             marginBottom: '1.5rem',
           }}
         >
-            Join us July&nbsp;26th • 12–6 PM for flash tattoos, piercings, tooth gems, coffee&nbsp;&amp; more!
+            Join us July&nbsp;26th • 12–6 PM for flash tattoos, tooth gems, coffee&nbsp;&amp; more!
         </motion.p>
 
           {/* countdown */}

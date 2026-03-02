@@ -24,8 +24,8 @@ const REVIEWS = [
     author: 'Sam Landon',
     rating: 5,
     when: '2 months ago',
-    text: 'First tattoo with Ki—looks great. Also got pierced at a flash event by Axel. Loved both experiences and will be back.',
-    artists: ['Ki', 'Axel']
+    text: 'First tattoo with Ki—looks great. Loved the experience and will be back.',
+    artists: ['Ki']
   },
   {
     author: 'Cait Foster',

@@ -36,7 +36,6 @@ export default function EventsPage() {
     { name: 'T', url: 'https://www.instagram.com/_.t._money/' },
     { name: 'Mia', url: 'https://www.instagram.com/miachristattoo/' },
     { name: 'Ki', url: 'https://www.instagram.com/parksart._/' },
-    { name: 'Axel', url: 'https://www.instagram.com/piercingsbyaxel/' },
     { name: 'Toasted Bean Coffee', url: 'https://www.instagram.com/toastedbeancoffeetruck/' },
     { name: 'Zen by Zanaya', url: 'https://www.instagram.com/zenbyzanaya/' },
   ];
