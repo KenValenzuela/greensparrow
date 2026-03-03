@@ -27,7 +27,7 @@ const sections = [
       {
         id: 'age-limit',
         question: 'What’s the age requirement?',
-        answer: 'You must be 18+ for tattoos. Piercings may be done for 16+ with a guardian and valid ID.',
+        answer: 'You must be 18+ for tattoos.',
       },
     ],
   },
@@ -115,11 +115,6 @@ const sections = [
         id: 'accepted-id',
         question: 'What ID is accepted?',
         answer: 'U.S. driver’s license, passport, military ID, state ID (non-driver), and Tribal IDs with signature are all accepted in Arizona.',
-      },
-      {
-        id: 'underage',
-        question: 'What if I’m under 18?',
-        answer: 'For piercings only. A parent/legal guardian must be present and complete the form on your behalf.',
       },
     ],
   },

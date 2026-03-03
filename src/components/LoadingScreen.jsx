@@ -8,7 +8,6 @@ import Image from 'next/image';
 import useTypewriter from '@/hooks/useTypewriter';
 
 const loadingImages = [
-  '/images/loading/axel_piercing.webp',
   '/images/loading/jjk-leg-sleeve-t.webp',
   '/images/loading/chameleon.webp',
   '/images/loading/fox-ki.webp',
