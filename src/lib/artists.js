@@ -6,6 +6,7 @@ export const artists = [
   { slug: 'mia',    name: 'Mia'            },
   { slug: 'mickey', name: 'Micky'         },
     {slug:'t',name:'T-Money'},
+  { slug: 'stella', name: 'Stella' },
   { slug: 'cruz', name: 'Cruz' },
-  // …add new entries here as you create folders…
+  { slug: 'river', name: 'River' },
 ];
