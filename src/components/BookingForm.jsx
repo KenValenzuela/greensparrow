@@ -28,7 +28,7 @@ const initial = {
     images: [],
 };
 
-const ARTISTS = ['Mickey', 'T', 'Mia', 'Ki', 'Stella'];
+const ARTISTS = ['Mickey', 'T', 'Mia', 'Ki', 'Stella', 'Cruz', 'Dallon Oracle'];
 const STYLES = ['Black & Grey', 'Traditional', 'Neo-traditional', 'Fine Line', 'Color'];
 
 /* -------------------- Press motion -------------------- */
