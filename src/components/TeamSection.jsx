@@ -48,6 +48,13 @@ const artists = [
     bio: 'Stella brings her background in Intermedia Art to tattooing, focusing on ornamental and bold designs while building her skills across all styles.',
     portfolio: '/artists/stella',
   },
+  {
+    name: 'Cruz',
+    role: 'Fine Line & Realism',
+    image: '/images/artists/cruz/cruz_portrait.webp',
+    bio: 'Cruz blends technical precision with artistic storytelling, specializing in fine line and realism with a pop culture and surrealist edge.',
+    portfolio: '/artists/cruz',
+  },
 ];
 
 export default function TeamSection() {
