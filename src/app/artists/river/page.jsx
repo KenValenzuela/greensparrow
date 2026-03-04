@@ -6,18 +6,18 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 
 export default function ArtistPage() {
-  const slug = 'cruz';
+  const slug = 'river';
 
-  const portraitFilename = 'cruz_portrait.webp';
+  const portraitFilename = 'river_portrait.webp';
 
   const workImages = [
-    'cruz_1.webp',
-    'cruz_2.webp',
-    'cruz_3.webp',
-    'cruz_4.webp',
-    'cruz_5.webp',
-    'cruz_6.webp',
-    'cruz_7.webp',
+    'river_1.webp',
+    'river_2.webp',
+    'river_3.webp',
+    'river_4.webp',
+    'river_5.webp',
+    'river_6.webp',
+    'river_7.webp',
   ];
 
   useEffect(() => {
@@ -35,18 +35,18 @@ export default function ArtistPage() {
             alt={`${slug}-portrait`}
             style={styles.portrait}
           />
-          <h1 style={styles.name}>Cruz</h1>
+          <h1 style={styles.name}>River</h1>
           <p style={styles.title}>Tattoo Artist</p>
           <div style={styles.tags}>
-            {['Fine Line', 'Realism', 'Black & White', 'Pop Culture', 'Surrealism'].map((tag) => (
+            {['Fine Line', 'Hyper-Realism', 'Geometric', 'Dot Work', 'Asian Traditions'].map((tag) => (
               <span key={tag} style={styles.tag}>{tag}</span>
             ))}
           </div>
           <p style={styles.bio}>
-            Cruz is a tattoo artist with a degree in digital design — blending technical precision with artistic storytelling. He specializes in fine line and realism, creating dynamic black and white pieces. His work is heavily influenced by pop culture, music, and surrealism.
+            River is from the province of Yunnan Kunming in China. Prior to the US, he also lived in Thailand. A lifelong illustrator and painter who adapted his artistic skill to the medium of tattooing. He refers to his work as Needle Therapy — a collaboration with the client of his craft realizing their vision. Ultimately, adorning the body with a form of permanent artistic and personal expression to share our stories. He specializes in fine line, hyper-realism, as well as geometric and dot work. His original work explores themes of cosmology especially, the intersection of nature, mysticism, and science and religion. While adept at any style, he is also very familiar with many Asian tattoo traditions.
           </p>
           <Link
-            href="https://www.instagram.com/truztattooz/"
+            href="https://www.instagram.com/inkriver.daniel/"
             target="_blank"
             rel="noopener noreferrer"
             style={styles.cta}

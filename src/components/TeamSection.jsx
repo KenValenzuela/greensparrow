@@ -55,6 +55,13 @@ const artists = [
     bio: 'Cruz blends technical precision with artistic storytelling, specializing in fine line and realism with a pop culture and surrealist edge.',
     portfolio: '/artists/cruz',
   },
+  {
+    name: 'River',
+    role: 'Fine Line & Hyper-Realism',
+    image: '/images/artists/river/river_portrait.webp',
+    bio: 'River is a lifelong illustrator and painter who adapted his artistic skill to tattooing — what he calls Needle Therapy. He specializes in fine line, hyper-realism, geometric, and dot work.',
+    portfolio: '/artists/river',
+  },
 ];
 
 export default function TeamSection() {
