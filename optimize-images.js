@@ -12,7 +12,7 @@ const sharp = require('sharp');
 
 const INPUT_DIR = path.resolve(__dirname, 'public');
 const OUTPUT_DIR = path.resolve(__dirname, 'public');
-const ALLOWED = new Set(['.jpg', '.jpeg', '.png']);
+const ALLOWED = new Set(['.jpg', '.jpeg', '.png', '.heic', '.heif']);
 const MAX_WIDTH = 1920;   // px – adjust if you want a smaller ceiling
 const QUALITY = 75;     // WebP quality 0‑100
 
@@ -35,7 +35,7 @@ async function* walk(dir) {
         if (!ALLOWED.has(ext)) continue;          // skip mp4, svg, etc.
 
         const relPath = path.relative(INPUT_DIR, absPath);
-        const outPath = path.join(OUTPUT_DIR, relPath).replace(/\.(jpe?g|png)$/i, '.webp');
+        const outPath = path.join(OUTPUT_DIR, relPath).replace(/\.(jpe?g|png|heic|heif)$/i, '.webp');
         const outDir = path.dirname(outPath);
         await fsp.mkdir(outDir, {recursive: true});
 
