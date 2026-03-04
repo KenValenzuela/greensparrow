@@ -18,6 +18,9 @@ export default function ArtistPage() {
     'river_5.webp',
     'river_6.webp',
     'river_7.webp',
+    'river_8.webp',
+    'river_9.webp',
+    'river_10.webp',
   ];
 
   useEffect(() => {
