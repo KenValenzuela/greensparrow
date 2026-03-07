@@ -1,7 +1,7 @@
 // src/lib/artists.js
 
 export const artists = [
-  { slug: 'dallon', name: 'Dallon Oracle'  },
+  { slug: 'dallon', name: 'Dallon'  },
   { slug: 'ki',     name: 'Ki'             },
   { slug: 'mia',    name: 'Mia'            },
   { slug: 'mickey', name: 'Micky'         },

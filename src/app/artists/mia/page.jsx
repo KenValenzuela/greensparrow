@@ -35,7 +35,7 @@ export default function ArtistPage() {
           <h1 style={styles.name}>Mia</h1>
           <p style={styles.title}>Tattoo Artist</p>
           <div style={styles.tags}>
-            {['Black & Grey', 'Illustrative', 'Fine Line',].map((tag) => (
+            {['Black & Grey', 'Illustrative', 'Delicate',].map((tag) => (
                 <span key={tag} style={styles.tag}>{tag}</span>
             ))}
           </div>
