@@ -35,10 +35,10 @@ const artists = [
     portfolio: '/artists/ki',
   },
   {
-    name: 'Dallon Oracle',
+    name: 'Dallon',
     role: 'Apprentice',
       image: '/images/artists/dallon/dallon_portrait.webp',
-    bio: 'Dallon Oracle is a new apprentice passionate about learning japanese and neo-traditional styles.',
+    bio: 'Dallon is a new apprentice passionate about learning japanese and neo-traditional styles.',
     portfolio: '/artists/dallon',
   },
   {

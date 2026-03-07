@@ -29,7 +29,7 @@ export default function ArtistPage() {
             alt={`${slug}-portrait`}
             style={styles.portrait}
           />
-          <h1 style={styles.name}>Dallon Oracle</h1>
+          <h1 style={styles.name}>Dallon</h1>
           <p style={styles.title}>Apprentice</p>
           <div style={styles.tags}>
             {['Mixed-Media', 'Symbolism', 'Body Affirming', ].map((tag) => (
@@ -37,7 +37,7 @@ export default function ArtistPage() {
             ))}
           </div>
           <p style={styles.bio}>
-Dallon Oracle is a lifelong artist and current art major at Arizona State University, with a passion for oil painting and ceramics. His journey into tattooing is rooted in creating affirming experiences for trans and queer bodies—using art as a way to help others feel more at home in themselves. As an apprentice, Dallon Oracles brings a thoughtful, expressive energy to every piece and is excited to begin translating their artistic vision onto skin.          </p>
+Dallon is a lifelong artist and current art major at Arizona State University, with a passion for oil painting and ceramics. His journey into tattooing is rooted in creating affirming experiences for trans and queer bodies—using art as a way to help others feel more at home in themselves. As an apprentice, Dallon brings a thoughtful, expressive energy to every piece and is excited to begin translating their artistic vision onto skin.          </p>
           <Link
               href="https://www.instagram.com/irezumi.elf/"
             target="_blank"
